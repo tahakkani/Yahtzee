@@ -27,6 +27,7 @@ public class YahtzeePlayer {
             player1.determine_possibleScores();
             player1.possibleScores.displayCard(DICE_IN_PLAY);
             player1.hand.clear();
+            //you must clear out possible scores every time
             System.out.println("\nEnter 'y' to play again ");
             playAgain = kb.next();
         }
