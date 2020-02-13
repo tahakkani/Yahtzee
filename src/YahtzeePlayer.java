@@ -7,7 +7,7 @@ import java.util.Scanner;
  * This class is a Yahtzee player, whose member fields are the player's hand (an ArrayList of YahtzeeDie),
  * the player's scorecard (a series of ScoreLines as well as tallying fields), and a temporary scorecard the displays
  * possible scoring to the user at the end of each turn. This class also has the DICE_IN_PLAY field for the time being,
- * which will probably be passed up to a higher class down the road.
+ * which will probably be passed up to a higher class down the road. yo
  *
  * CPSC 224
  * Assignment #1
