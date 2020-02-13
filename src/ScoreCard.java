@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 /**
  * This class implements a Yahtzee score card. It is composed of several scorelines (both in ArrayList and individual
  * form) as well as upper and lower scorecard 'total's (<code>int</code>). There are also <code>int</code>s to keep
@@ -11,8 +13,6 @@
  * @version 1.0 2/5/2020
  * @see ScoreLine
  */
-
-import java.util.ArrayList;
 
 public class ScoreCard {
 
@@ -32,21 +32,44 @@ public class ScoreCard {
     private int totalLower = 0;
     private int grandTotal = 0;
 
+
+    /**
+     * @return the lines on the upper section of the Yahtzee scorecard (as an ArrayList of ScoreLines)
+     */
     public ArrayList<ScoreLine> getUpperSection(){return upperSection;}
+
+    /**
+     * @return the lines on the "_ of a Kind" portion of the Yahtzee scorecard (as an ArrayList of ScoreLines)
+     */
     public ArrayList<ScoreLine> getOfAKinds(){return ofAKinds;}
+
+    /**
+     * @return the lines on the "Sequence of _" section of the Yahtzee scorecard (as an ArrayList of ScoreLines)
+     */
     public ArrayList<ScoreLine> getStraights(){return straights;}
-    public ScoreLine getFullHouse(){return  fullHouse;}
-    public ScoreLine getYahtzee(){return  yahtzee;}
+
+    /**
+     * @return the line on the "Full House" section of the Yahtzee scorecard (as a ScoreLine)
+     */
+    public ScoreLine getFullHouse(){return fullHouse;}
+
+    /**
+     * @return the line on the "YAHTZEE" section of the Yahtzee scorecard (as a ScoreLine)
+     */
+    public ScoreLine getYahtzee(){return yahtzee;}
+
+    /**
+     * @return the line on the "Chance" section of the Yahtzee scorecard (as a ScoreLine)
+     */
     public ScoreLine getChance(){return chance;}
 
-    public static void main(String[] args) {
-        int dice = 10;
-        ScoreCard myCard = new ScoreCard(dice, 9);
-
-        myCard.displayCard(dice);
-
-    }
-
+    /**
+     * Constructor for a ScoreCard. The card is constructed dynamically as a function of how many dice are in play
+     * and how many sides are on a dice. These two parameters dictate what fields will appear on the card.
+     *
+     * @param diceInPlay is passed to this method from the YahtzeePlayer class.
+     * @param sidesOnDice is passed to the method from the YahtzeeDie class.
+     */
     public ScoreCard(int diceInPlay, int sidesOnDice){
         for(int i = 1; i < sidesOnDice + 1; i++)
             upperSection.add(new ScoreLine(i + "", 0));
@@ -56,6 +79,10 @@ public class ScoreCard {
             straights.add(new ScoreLine("Sequence of " + i, 0));
     }
 
+    /**
+     * Displays the entire card in an easily comprehensible format for the user.
+     * @param diceInPlay is passed to this method from the YahtzeePlayer class.
+     */
     public void displayCard(int diceInPlay){
             //upper scorecard
             for (ScoreLine sL : getUpperSection())
@@ -70,6 +97,9 @@ public class ScoreCard {
             getChance().displayLine();
     }
 
+    /**
+     * Calculates the total of the entire upper section of the scorecard, used for determining if a bonus is earned
+     */
     public void calc_totalUpper(){
         for (ScoreLine sL : upperSection)
             totalUpper += sL.get_scoreValue();
@@ -77,6 +107,9 @@ public class ScoreCard {
             addUpperBonus();
     }
 
+    /**
+     * Calculates the total of the entire lower section of the scorecard.
+     */
     public void calc_totalLower(){
         for (ScoreLine sL : ofAKinds)
             totalLower += sL.get_scoreValue();
@@ -89,15 +122,40 @@ public class ScoreCard {
             addYahtzeeBonus();
     }
 
+    /**
+     * Calculates the total of the entirety of the scorecard
+     */
     public void calc_grandTotal(){
         grandTotal = totalLower + totalUpper;
     }
 
+    /**
+     * This method adds a bonus of 35 points to the scorecard once the card is initially totaled. Should only
+     * be called at the end of the game.
+     */
     private void addUpperBonus() {
         totalUpper += 35;
     }
 
+    /**
+     * This adds a bonus of 100 points for every extra Yahtzee that the player gets
+     */
     private void addYahtzeeBonus(){
         totalLower += 100;
+    }
+
+    /**
+     * This resets the values of the whole scorecard to 0
+     */
+    public void reset(){
+        for (ScoreLine sL : getUpperSection())
+            sL.set_scoreValue(0);
+        for (ScoreLine sL : getOfAKinds())
+            sL.set_scoreValue(0);
+        getFullHouse().set_scoreValue(0);
+        for (ScoreLine sL : getStraights())
+            sL.set_scoreValue(0);
+        getYahtzee().set_scoreValue(0);
+        getChance().set_scoreValue(0);
     }
 }

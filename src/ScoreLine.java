@@ -17,12 +17,6 @@ public class ScoreLine {
     private final String title;
     private int scoreValue;
 
-
-    public static void main(String[] args) {
-        ScoreLine mysL = new ScoreLine("Yooo", 15);
-        mysL.displayLine();
-    }
-
     /**
      * Explicit value constructor for ScoreLine when no score is provided.
      *
@@ -72,6 +66,10 @@ public class ScoreLine {
         return title;
     }
 
+
+    /**
+     * Displays the score on a single line in a readable and interpretable manner.
+     */
     public void displayLine(){
         System.out.println("Score " + get_scoreValue() + " on the " + get_title() + " line");
     }

@@ -1,12 +1,31 @@
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Scanner;
 
+/**
+ * This class is a Yahtzee player, whose member fields are the player's hand (an ArrayList of YahtzeeDie),
+ * the player's scorecard (a series of ScoreLines as well as tallying fields), and a temporary scorecard the displays
+ * possible scoring to the user at the end of each turn. This class also has the DICE_IN_PLAY field for the time being,
+ * which will probably be passed up to a higher class down the road.
+ *
+ * CPSC 224
+ * Assignment #1
+ * No sources to cite, other than the starter files provided by Dr. Worobec,
+ * specifically for this assignment.
+ *
+ * @author Taha Hakkani
+ * @version 1.0 2/5/2020
+ * @see YahtzeeDie
+ * @see ScoreCard
+ */
 public class YahtzeePlayer {
 
     private final static int DICE_IN_PLAY = 5;
     private ArrayList<YahtzeeDie> hand = new ArrayList<>();
+    //This ScoreCard is the player's official score card for the game
     private ScoreCard scores = new ScoreCard(DICE_IN_PLAY, YahtzeeDie.NUM_SIDES);
+    //This ScoreCard is the player's card used to display potential moves based on the current hand
     private ScoreCard possibleScores = new ScoreCard(DICE_IN_PLAY, YahtzeeDie.NUM_SIDES);
 
 
@@ -14,12 +33,10 @@ public class YahtzeePlayer {
         YahtzeePlayer player1 = new YahtzeePlayer();
         Scanner kb = new Scanner(System.in);
 
-        //System.out.println(player1.possibleScores);
-        //System.out.println(player1.scores);
         String playAgain = "y";
 
         while (Objects.equals(playAgain, "y")) {
-            player1.executePhase1();
+            player1.rollingPhase();
 
             //start scoring
             //hand needs to be sorted to check for straights
@@ -27,23 +44,27 @@ public class YahtzeePlayer {
             player1.determine_possibleScores();
             player1.possibleScores.displayCard(DICE_IN_PLAY);
             player1.hand.clear();
-            //you must clear out possible scores every time
+            player1.possibleScores.reset();
             System.out.println("\nEnter 'y' to play again ");
             playAgain = kb.next();
         }
     }
 
-    public void executePhase1(){
+    /**
+     * This function basically implements the rolling part of the players turn. It allows player to keep dice
+     * by typing in a string of 'y' and 'n's. Displays the hand after each roll.
+     */
+    public void rollingPhase(){
         Scanner kb = new Scanner(System.in);
-        String keep = "";
+        StringBuilder keep = new StringBuilder();
         System.out.println(keep);
         for (int i = 0; i < DICE_IN_PLAY; i++){
             hand.add(new YahtzeeDie());
-            keep = keep + "n";
+            keep.append("n");
         }
 
         int roll = 1;
-        while (roll < 4 && keep.contains("n")) {
+        while (roll < 4 && keep.toString().contains("n")) {
             //roll dice not kept
             for (int dieNumber = 0; dieNumber < DICE_IN_PLAY; dieNumber++) {
                 if (keep.charAt(dieNumber) != 'y')
@@ -56,12 +77,19 @@ public class YahtzeePlayer {
             //if not the last roll of the hand prompt the user for dice to keep
             if (roll < 3) {
                 System.out.println("enter dice to keep (y or n) ");
-                keep = kb.nextLine();
+                keep = Optional.ofNullable(kb.nextLine()).map(StringBuilder::new).orElse(null);
             }
             roll++;
         }
     }
 
+
+    /**
+     * This is called after each turn of rolling to determine for the player on which lines they can score and
+     * how much they will score on that line. Uses other functions in this class to determine if the hand meets
+     * the criteria for a straight, full house, yahtzee, etc
+     *
+     */
     public void determine_possibleScores(){
         //upper scorecard
         for(ScoreLine sL : possibleScores.getUpperSection()){
@@ -98,10 +126,11 @@ public class YahtzeePlayer {
             possibleScores.getYahtzee().set_scoreValue(50);
 
         possibleScores.getChance().set_scoreValue(totalAllDice());
-
     }
 
-    //this function returns the total value of all dice in a hand
+    /**
+     * this function returns the total value of all dice in hand
+     */
     int totalAllDice(){
         int total = 0;
         for (YahtzeeDie yD : hand) {
@@ -110,7 +139,10 @@ public class YahtzeePlayer {
         return total;
     }
 
-    //bubble sort
+    /**
+     * Takes the hand and orders the YahtzeeDie's based on their sideUp values. Is needed to determine if a straight
+     * is acheived.
+     */
     public void sortAndDisplayHand() {
         boolean swap;
         YahtzeeDie temp;
@@ -131,13 +163,21 @@ public class YahtzeePlayer {
         displayHand();
     }
 
+    /**
+     * Displays the sideUp values of the hand across the screen horizontally
+     */
     public void displayHand(){
         for (int dieNumber = 0; dieNumber < DICE_IN_PLAY; dieNumber++)
             System.out.print(hand.get(dieNumber).getSideUp() + " ");
         System.out.println("\n");
     }
-    //this function returns the count of the die value occurring most in the hand
-//but not the value itself
+
+    /**
+     * this function returns the count of the die value occurring most in the hand but not the value itself
+     *
+     * @return the highest number of a single YahtzeeDie value in the hand
+     */
+
     public int maxOfAKindFound() {
         int maxCount = 0;
         int currentCount;
@@ -154,9 +194,12 @@ public class YahtzeePlayer {
         return maxCount;
     }
 
-//this function returns the length of the longest
-//straight found in a hand, hand must be sorted beforehand
-
+    /**
+     * this function returns the length of the longest
+     * straight found in a hand, hand must be sorted beforehand
+     *
+     * @return the highest straight found in the hand
+     */
     public int maxStraightFound() {
         int maxLength = 1;
         int curLength = 1;
@@ -171,8 +214,13 @@ public class YahtzeePlayer {
         return maxLength;
     }
 
-    //this function returns true if the hand is a full house
-//or false if it does not
+    /**
+     * this function returns true if the hand is a full house
+     * or false if it does not
+     *
+     * @return whether a full house was found or not
+     */
+
     public boolean fullHouseFound() {
         boolean foundFH = false;
         boolean found3K = false;

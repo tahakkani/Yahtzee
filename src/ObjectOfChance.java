@@ -1,3 +1,4 @@
+import java.util.Random;
 
 /**
  * This class implements any object of chance with a
@@ -14,8 +15,6 @@
  * @version 1.0 2/5/2020
  * @see YahtzeeDie
  */
-
-import java.util.Random;
 
 public class ObjectOfChance {
 
