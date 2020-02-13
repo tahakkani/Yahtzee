@@ -1,3 +1,5 @@
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Optional;
@@ -32,7 +34,22 @@ public class YahtzeePlayer {
     public static void main(String[] args) {
         YahtzeePlayer player1 = new YahtzeePlayer();
         Scanner kb = new Scanner(System.in);
+        /////
+        Scanner inFile = null;
+        ArrayList<String> configValues = new ArrayList<>();
 
+
+        try {
+            inFile = new Scanner(new File("yahtzeeConfig.txt"));
+            while (inFile.hasNextLine())    {
+                String line = inFile.nextLine();
+                configValues.add(line);
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            System.out.println("File not found");
+        }
+            /////
         String playAgain = "y";
 
         while (Objects.equals(playAgain, "y")) {
@@ -49,6 +66,10 @@ public class YahtzeePlayer {
             playAgain = kb.next();
         }
     }
+
+    /**
+     * Finds the file, opens it, reads the values and
+     */
 
     /**
      * This function basically implements the rolling part of the players turn. It allows player to keep dice
