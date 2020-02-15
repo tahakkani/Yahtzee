@@ -62,6 +62,7 @@ public class YahtzeePlayer {
      * Finds the file, opens it, reads the values and
      */
     private void gameInit(){
+        //load data from "yahtzeeConfig.txt" into an ArrayList
         Scanner inFile;
         ArrayList<String> configValues = new ArrayList<>();
         Scanner kb = new Scanner(System.in);
@@ -76,6 +77,7 @@ public class YahtzeePlayer {
             System.out.println("File not found");
         }
 
+        //display data from "yahtzeeConfig.txt" in an easy-to-read manner
         System.out.println(configValues);
         System.out.println("You are playing with " + configValues.get(1) + " " + configValues.get(0) + "-sided dice");
         System.out.println("You get " + configValues.get(2) + " rolls per hand\n");
@@ -83,6 +85,8 @@ public class YahtzeePlayer {
 
         String editConfig = kb.nextLine();
 
+        //if the user wants to edit the config, allow them to enter values for die sides, die number, and
+        //rolls per hand
         if (Objects.equals(editConfig, "y")){
             configValues.clear();
             System.out.println("Enter the number of sides you want on each die: ");
@@ -106,6 +110,7 @@ public class YahtzeePlayer {
 
 
         }
+        //set values that user chose/left as is
         YahtzeeDie.NUM_SIDES = Integer.parseInt(configValues.get(0));
         DICE_IN_PLAY = Integer.parseInt(configValues.get(1));
         rollsPerTurn = Integer.parseInt(configValues.get(2));
@@ -124,6 +129,7 @@ public class YahtzeePlayer {
             keep.append("n");
         }
 
+        //while there are still rolls left in the turn, re-roll all YahtzeeDie that were not kept
         int roll = 1;
         while (roll <= rollsPerTurn && Objects.requireNonNull(keep).toString().contains("n")) {
             //roll dice not kept
