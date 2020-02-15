@@ -62,7 +62,7 @@ public class YahtzeePlayer {
      * Finds the file, opens it, reads the values and
      */
     private void gameInit(){
-        Scanner inFile = null;
+        Scanner inFile;
         ArrayList<String> configValues = new ArrayList<>();
         Scanner kb = new Scanner(System.in);
 
@@ -101,8 +101,8 @@ public class YahtzeePlayer {
                 e.printStackTrace();
             }
             for (String config : configValues)
-                outFile.println(config);
-            outFile.close();
+                Objects.requireNonNull(outFile).println(config);
+            Objects.requireNonNull(outFile).close();
 
 
         }
@@ -125,7 +125,7 @@ public class YahtzeePlayer {
         }
 
         int roll = 1;
-        while (roll <= rollsPerTurn && keep.toString().contains("n")) {
+        while (roll <= rollsPerTurn && Objects.requireNonNull(keep).toString().contains("n")) {
             //roll dice not kept
             for (int dieNumber = 0; dieNumber < DICE_IN_PLAY; dieNumber++) {
                 if (keep.charAt(dieNumber) != 'y')
