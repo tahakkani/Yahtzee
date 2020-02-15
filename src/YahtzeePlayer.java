@@ -1,5 +1,6 @@
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Optional;
@@ -24,19 +25,23 @@ import java.util.Scanner;
 public class YahtzeePlayer {
 
     private static int DICE_IN_PLAY;
-    private int rollsPerTurn = 3;
-    private ArrayList<YahtzeeDie> hand = new ArrayList<>();
+    private int rollsPerTurn;
+    private ArrayList<YahtzeeDie> hand;
     //This ScoreCard is the player's official score card for the game
-    private ScoreCard scores = new ScoreCard(DICE_IN_PLAY, YahtzeeDie.NUM_SIDES);
+    private ScoreCard scores;
     //This ScoreCard is the player's card used to display potential moves based on the current hand
-    private ScoreCard possibleScores = new ScoreCard(DICE_IN_PLAY, YahtzeeDie.NUM_SIDES);
+    private ScoreCard possibleScores;
 
+    public YahtzeePlayer(){
+        gameInit();
+        scores = new ScoreCard(DICE_IN_PLAY, YahtzeeDie.NUM_SIDES);
+        hand = new ArrayList<>();
+        possibleScores = new ScoreCard(DICE_IN_PLAY, YahtzeeDie.NUM_SIDES);
+    }
     public static void main(String[] args) {
         YahtzeePlayer player1 = new YahtzeePlayer();
         Scanner kb = new Scanner(System.in);
         String playAgain = "y";
-
-        player1.gameInit();
 
         while (Objects.equals(playAgain, "y")) {
             player1.rollingPhase();
@@ -57,7 +62,7 @@ public class YahtzeePlayer {
      * Finds the file, opens it, reads the values and
      */
     private void gameInit(){
-        Scanner inFile = null, outFile = null;
+        Scanner inFile = null;
         ArrayList<String> configValues = new ArrayList<>();
         Scanner kb = new Scanner(System.in);
 
@@ -88,7 +93,16 @@ public class YahtzeePlayer {
             configValues.add(kb.next());
 
             //write new values to txt file
-            outFile = inFile;
+            PrintStream outFile = null;
+            try {
+                outFile = new PrintStream(new File("yahtzeeConfig.txt"));
+            } catch (FileNotFoundException e) {
+                System.out.println("File not found");
+                e.printStackTrace();
+            }
+            for (String config : configValues)
+                outFile.println(config);
+            outFile.close();
 
 
         }
@@ -122,7 +136,7 @@ public class YahtzeePlayer {
             displayHand();
 
             //if not the last roll of the hand prompt the user for dice to keep
-            if (roll < 3) {
+            if (roll <= rollsPerTurn) {
                 System.out.println("enter dice to keep (y or n) ");
                 keep = Optional.ofNullable(kb.nextLine()).map(StringBuilder::new).orElse(null);
             }
