@@ -19,7 +19,7 @@ public class ScoreCard {
     //The following fields constitute the lines that can be scored on in a Yahtzee scorecard
     private ArrayList<ScoreLine> upperSection = new ArrayList<>();
     private ArrayList<ScoreLine> ofAKinds = new ArrayList<>();
-    private ScoreLine fullHouse = new ScoreLine("Full House", 0);
+    private ScoreLine fullHouse = null;
     private ArrayList<ScoreLine> straights = new ArrayList<>();
     private ScoreLine yahtzee = new ScoreLine("YAHTZEE", 0);
     private ScoreLine chance = new ScoreLine("Chance", 0);
@@ -77,24 +77,26 @@ public class ScoreCard {
             ofAKinds.add(new ScoreLine(i + " of a Kind", 0));
         for(int i = 4; i <= Math.min(diceInPlay, sidesOnDice); i++)
             straights.add(new ScoreLine("Sequence of " + i, 0));
+        if (diceInPlay >= 5) //if full house is possible
+            fullHouse = new ScoreLine("Full House", 0);
     }
 
     /**
      * Displays the entire card in an easily comprehensible format for the user.
-     * @param diceInPlay is passed to this method from the YahtzeePlayer class.
+     *
      */
-    public void displayCard(int diceInPlay){
-            //upper scorecard
-            for (ScoreLine sL : getUpperSection())
-                sL.displayLine();
-            for (ScoreLine sL : getOfAKinds())
-                sL.displayLine();
-            if (diceInPlay >= 5) //if full house is possible
-                getFullHouse().displayLine();
-            for (ScoreLine sL : getStraights())
-                sL.displayLine();
-            getYahtzee().displayLine();
-            getChance().displayLine();
+    public void displayCard() {
+        //upper scorecard
+        for (ScoreLine sL : getUpperSection())
+            sL.displayLine();
+        for (ScoreLine sL : getOfAKinds())
+            sL.displayLine();
+        if (getFullHouse() != null) //if full house is possible
+            getFullHouse().displayLine();
+        for (ScoreLine sL : getStraights())
+            sL.displayLine();
+        getYahtzee().displayLine();
+        getChance().displayLine();
     }
 
     /**
@@ -144,6 +146,20 @@ public class ScoreCard {
         totalLower += 100;
     }
 
+
+    public ScoreLine findLine(String title){
+        for (ScoreLine sL : getUpperSection())
+            if (title.equals(sL.get_title())) return sL;
+        for (ScoreLine sL : getOfAKinds())
+            if (title.equals(sL.get_title())) return sL;
+        if(getFullHouse() != null)
+            if (title.equals(getFullHouse().get_title())) return getFullHouse();
+        for (ScoreLine sL : getStraights())
+            if (title.equals(sL.get_title())) return sL;
+        if (title.equals(getYahtzee().get_title())) return getYahtzee();
+        if (title.equals(getChance().get_title())) return getChance();
+        }
+
     /**
      * This resets the values of the whole scorecard to 0
      */
@@ -152,7 +168,8 @@ public class ScoreCard {
             sL.set_scoreValue(0);
         for (ScoreLine sL : getOfAKinds())
             sL.set_scoreValue(0);
-        getFullHouse().set_scoreValue(0);
+        if(getFullHouse() != null)
+            getFullHouse().set_scoreValue(0);
         for (ScoreLine sL : getStraights())
             sL.set_scoreValue(0);
         getYahtzee().set_scoreValue(0);

@@ -16,6 +16,7 @@ public class ScoreLine {
 
     private final String title;
     private int scoreValue;
+    private boolean isUsed;
 
     /**
      * Explicit value constructor for ScoreLine when no score is provided.
@@ -23,7 +24,7 @@ public class ScoreLine {
      * @param aTitle title of the line (e.g. "Yahtzee" or "Three of a Kind")
      */
     public ScoreLine (String aTitle){
-        title = aTitle; scoreValue = 0;
+        title = aTitle; scoreValue = 0; isUsed = false;
     }
 
     /**
@@ -36,6 +37,7 @@ public class ScoreLine {
     public ScoreLine (String aTitle, int aScore){
         title = aTitle;
         scoreValue = aScore;
+        isUsed = false;
     }
 
     /**
@@ -66,7 +68,7 @@ public class ScoreLine {
         return title;
     }
 
-
+    public void useLine(){ isUsed = true;}
     /**
      * Displays the score on a single line in a readable and interpretable manner.
      */

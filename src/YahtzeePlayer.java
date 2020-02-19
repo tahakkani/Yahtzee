@@ -25,12 +25,40 @@ import java.util.Scanner;
 public class YahtzeePlayer {
 
     private static int DICE_IN_PLAY;
-    private int rollsPerTurn;
+    private static int ROLLS_PER_TURN;
     private ArrayList<YahtzeeDie> hand;
     //This ScoreCard is the player's official score card for the game
     private ScoreCard scores;
     //This ScoreCard is the player's card used to display potential moves based on the current hand
     private ScoreCard possibleScores;
+
+    public static void main(String[] args) {
+        YahtzeePlayer player1 = new YahtzeePlayer();
+        Scanner kb = new Scanner(System.in);
+        String playAgain = "y";
+
+        while (Objects.equals(playAgain, "y")) {
+            player1.takeTurn();
+            System.out.println("\nEnter 'y' to play again ");
+            playAgain = kb.next();
+        }
+    }
+    public void selectLineToScoreOn(){
+        Scanner kb = new Scanner(System.in);
+        System.out.println("Please enter the title of the line that you would like to score on: ");
+        String entry = kb.nextLine();
+
+    }
+    public void takeTurn(){
+        rollingPhase();
+        //start scoring
+        //hand needs to be sorted to check for straights
+        sortAndDisplayHand();
+        determine_possibleScores();
+        possibleScores.displayCard();
+        hand.clear();
+        possibleScores.reset();
+    }
 
     public YahtzeePlayer(){
         gameInit();
@@ -38,39 +66,19 @@ public class YahtzeePlayer {
         hand = new ArrayList<>();
         possibleScores = new ScoreCard(DICE_IN_PLAY, YahtzeeDie.NUM_SIDES);
     }
-    public static void main(String[] args) {
-        YahtzeePlayer player1 = new YahtzeePlayer();
-        Scanner kb = new Scanner(System.in);
-        String playAgain = "y";
-
-        while (Objects.equals(playAgain, "y")) {
-            player1.rollingPhase();
-
-            //start scoring
-            //hand needs to be sorted to check for straights
-            player1.sortAndDisplayHand();
-            player1.determine_possibleScores();
-            player1.possibleScores.displayCard(DICE_IN_PLAY);
-            player1.hand.clear();
-            player1.possibleScores.reset();
-            System.out.println("\nEnter 'y' to play again ");
-            playAgain = kb.next();
-        }
-    }
-
     /**
      * Finds the file, opens it, reads the values and
      */
     private void gameInit(){
         //load data from "yahtzeeConfig.txt" into an ArrayList
         Scanner inFile;
-        ArrayList<String> configValues = new ArrayList<>();
+        ArrayList<Integer> configValues = new ArrayList<>();
         Scanner kb = new Scanner(System.in);
 
         try {
             inFile = new Scanner(new File("yahtzeeConfig.txt"));
             while (inFile.hasNextLine())    {
-                configValues.add(inFile.nextLine());
+                configValues.add(Integer.parseInt(inFile.nextLine()));
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -90,11 +98,17 @@ public class YahtzeePlayer {
         if (Objects.equals(editConfig, "y")){
             configValues.clear();
             System.out.println("Enter the number of sides you want on each die: ");
-            configValues.add(kb.next());
+
+            try{
+                configValues.add(Integer.parseInt(kb.nextLine()));
+            }
+            catch(NumberFormatException e) {
+                System.out.println("That is not a valid entry");
+            }
             System.out.println("Enter the number of dice in play: ");
-            configValues.add(kb.next());
+            configValues.add(Integer.parseInt(kb.nextLine()));
             System.out.println("Enter the number of rolls per hand: ");
-            configValues.add(kb.next());
+            configValues.add(Integer.parseInt(kb.nextLine()));
 
             //write new values to txt file
             PrintStream outFile = null;
@@ -104,16 +118,16 @@ public class YahtzeePlayer {
                 System.out.println("File not found");
                 e.printStackTrace();
             }
-            for (String config : configValues)
+            for (Integer config : configValues)
                 Objects.requireNonNull(outFile).println(config);
             Objects.requireNonNull(outFile).close();
 
 
         }
         //set values that user chose/left as is
-        YahtzeeDie.NUM_SIDES = Integer.parseInt(configValues.get(0));
-        DICE_IN_PLAY = Integer.parseInt(configValues.get(1));
-        rollsPerTurn = Integer.parseInt(configValues.get(2));
+        YahtzeeDie.NUM_SIDES = configValues.get(0);
+        DICE_IN_PLAY = configValues.get(1);
+        ROLLS_PER_TURN = configValues.get(2);
     }
 
     /**
@@ -131,7 +145,7 @@ public class YahtzeePlayer {
 
         //while there are still rolls left in the turn, re-roll all YahtzeeDie that were not kept
         int roll = 1;
-        while (roll <= rollsPerTurn && Objects.requireNonNull(keep).toString().contains("n")) {
+        while (roll < ROLLS_PER_TURN && Objects.requireNonNull(keep).toString().contains("n")) {
             //roll dice not kept
             for (int dieNumber = 0; dieNumber < DICE_IN_PLAY; dieNumber++) {
                 if (keep.charAt(dieNumber) != 'y')
@@ -142,7 +156,7 @@ public class YahtzeePlayer {
             displayHand();
 
             //if not the last roll of the hand prompt the user for dice to keep
-            if (roll <= rollsPerTurn) {
+            if (roll <= ROLLS_PER_TURN) {
                 System.out.println("enter dice to keep (y or n) ");
                 keep = Optional.ofNullable(kb.nextLine()).map(StringBuilder::new).orElse(null);
             }
