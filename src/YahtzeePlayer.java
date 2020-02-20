@@ -43,19 +43,39 @@ public class YahtzeePlayer {
             playAgain = kb.next();
         }
     }
-    public void selectLineToScoreOn(){
+    public void scoreOnLine(){
+        possibleScores.displayCard();
         Scanner kb = new Scanner(System.in);
-        System.out.println("Please enter the title of the line that you would like to score on: ");
-        String entry = kb.nextLine();
+        boolean lineFound = false;
+        while(!lineFound) {
+            System.out.println("Please enter the title of the line that you would like to score on: ");
+            String entry = kb.nextLine();
+            ScoreLine newEntryLine = possibleScores.findLine(entry);
+            if(newEntryLine != null){
+                scores.findLine(entry).setScoreValue(newEntryLine.getScoreValue());
+                lineFound = true;
+            }
+            else
+                System.out.println("That line was not found!");
+        }
+    }
 
+    public void askToDisplayScorecard(){
+        System.out.println("Would you like to see your scorecard?"  );
+        Scanner kb = new Scanner(System.in);
+        if(kb.nextLine() == "y");
+            scores.displayCard();
     }
     public void takeTurn(){
+        askToDisplayScorecard();
         rollingPhase();
         //start scoring
         //hand needs to be sorted to check for straights
         sortAndDisplayHand();
         determine_possibleScores();
-        possibleScores.displayCard();
+        //possibleScores.displayCard();
+        scoreOnLine();
+        askToDisplayScorecard();
         hand.clear();
         possibleScores.reset();
     }
@@ -121,8 +141,6 @@ public class YahtzeePlayer {
             for (Integer config : configValues)
                 Objects.requireNonNull(outFile).println(config);
             Objects.requireNonNull(outFile).close();
-
-
         }
         //set values that user chose/left as is
         YahtzeeDie.NUM_SIDES = configValues.get(0);

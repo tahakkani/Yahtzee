@@ -127,7 +127,7 @@ public class ScoreCard {
     /**
      * Calculates the total of the entirety of the scorecard
      */
-    public void calc_grandTotal(){
+    public void calcGrandTotal(){
         grandTotal = totalLower + totalUpper;
     }
 
@@ -149,16 +149,15 @@ public class ScoreCard {
 
     public ScoreLine findLine(String title){
         for (ScoreLine sL : getUpperSection())
-            if (title.equals(sL.get_title())) return sL;
+            if (title.equals(sL.getTitle())) return sL;
         for (ScoreLine sL : getOfAKinds())
-            if (title.equals(sL.get_title())) return sL;
+            if (title.equals(sL.getTitle())) return sL;
         if(getFullHouse() != null)
-            if (title.equals(getFullHouse().get_title())) return getFullHouse();
+            if (title.equals(getFullHouse().getTitle())) return getFullHouse();
         for (ScoreLine sL : getStraights())
-            if (title.equals(sL.get_title())) return sL;
-        if (title.equals(getYahtzee().get_title())) return getYahtzee();
-        if (title.equals(getChance().get_title())) return getChance();
-        System.out.println("Line not found");
+            if (title.equals(sL.getTitle())) return sL;
+        if (title.equals(getYahtzee().getTitle())) return getYahtzee();
+        if (title.equals(getChance().getTitle())) return getChance();
         return null;
     }
 

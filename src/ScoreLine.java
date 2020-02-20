@@ -64,7 +64,7 @@ public class ScoreLine {
      *
      * @return the title of this score line.
      */
-    public String get_title(){
+    public String getTitle(){
         return title;
     }
 
@@ -75,6 +75,6 @@ public class ScoreLine {
      * Displays the score on a single line in a readable and interpretable manner.
      */
     public void displayLine(){
-        System.out.println("Score " + getScoreValue() + " on the " + get_title() + " line");
+        System.out.println("Score " + getScoreValue() + " on the " + getTitle() + " line");
     }
 }
