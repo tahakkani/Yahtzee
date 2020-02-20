@@ -180,33 +180,33 @@ public class YahtzeePlayer {
                 if(yD.getSideUp() == (dieValue))
                     currCount++;
             }
-            sL.set_scoreValue(dieValue * currCount);
+            sL.setScoreValue(dieValue * currCount);
         }
 
         //lower scorecard
         //find max of a kind
         for (ScoreLine sL : possibleScores.getOfAKinds()){
             if (maxOfAKindFound() >= possibleScores.getOfAKinds().indexOf(sL) + 3)
-                sL.set_scoreValue(totalAllDice());
+                sL.setScoreValue(totalAllDice());
         }
 
         ///full house
         if (fullHouseFound())
-            possibleScores.getFullHouse().set_scoreValue(25);
+            possibleScores.getFullHouse().setScoreValue(25);
 
         //test for all possible straights
         for (ScoreLine currLine : possibleScores.getStraights()) {
             int currIndex = possibleScores.getStraights().indexOf(currLine);
             //if max straight is greater than or equal to what we can count in the current line
             if (maxStraightFound() >= currIndex + 4)
-                currLine.set_scoreValue((currIndex + 3) * 10);
+                currLine.setScoreValue((currIndex + 3) * 10);
         }
 
         //test for YAHTZEE, adds score
         if (maxOfAKindFound() == DICE_IN_PLAY)
-            possibleScores.getYahtzee().set_scoreValue(50);
+            possibleScores.getYahtzee().setScoreValue(50);
 
-        possibleScores.getChance().set_scoreValue(totalAllDice());
+        possibleScores.getChance().setScoreValue(totalAllDice());
     }
 
     /**

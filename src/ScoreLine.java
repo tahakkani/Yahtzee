@@ -46,7 +46,7 @@ public class ScoreLine {
      * @param	aScore this is the score that will be assigned.
      * @see	"No Borrowed Code"
      */
-    public void set_scoreValue(int aScore){
+    public void setScoreValue(int aScore){
         scoreValue = aScore;
     }
 
@@ -55,7 +55,7 @@ public class ScoreLine {
      *
      * @return the score at this line.
      */
-    public int get_scoreValue(){
+    public int getScoreValue(){
         return scoreValue;
     }
 
@@ -68,11 +68,13 @@ public class ScoreLine {
         return title;
     }
 
-    public void useLine(){ isUsed = true;}
+    public void setUsed(boolean used){ isUsed = used; }
+
+    public boolean isUsed() { return isUsed; }
     /**
      * Displays the score on a single line in a readable and interpretable manner.
      */
     public void displayLine(){
-        System.out.println("Score " + get_scoreValue() + " on the " + get_title() + " line");
+        System.out.println("Score " + getScoreValue() + " on the " + get_title() + " line");
     }
 }

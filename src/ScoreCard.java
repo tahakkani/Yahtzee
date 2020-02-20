@@ -104,7 +104,7 @@ public class ScoreCard {
      */
     public void calc_totalUpper(){
         for (ScoreLine sL : upperSection)
-            totalUpper += sL.get_scoreValue();
+            totalUpper += sL.getScoreValue();
         if (totalUpper > 62)
             addUpperBonus();
     }
@@ -114,12 +114,12 @@ public class ScoreCard {
      */
     public void calc_totalLower(){
         for (ScoreLine sL : ofAKinds)
-            totalLower += sL.get_scoreValue();
-        totalLower += fullHouse.get_scoreValue();
+            totalLower += sL.getScoreValue();
+        totalLower += fullHouse.getScoreValue();
         for (ScoreLine sL : straights)
-            totalLower += sL.get_scoreValue();
-        totalLower += yahtzee.get_scoreValue();
-        totalLower += chance.get_scoreValue();
+            totalLower += sL.getScoreValue();
+        totalLower += yahtzee.getScoreValue();
+        totalLower += chance.getScoreValue();
         for (int i = 0; i < bonusYahtzees; i++)
             addYahtzeeBonus();
     }
@@ -158,21 +158,23 @@ public class ScoreCard {
             if (title.equals(sL.get_title())) return sL;
         if (title.equals(getYahtzee().get_title())) return getYahtzee();
         if (title.equals(getChance().get_title())) return getChance();
-        }
+        System.out.println("Line not found");
+        return null;
+    }
 
     /**
      * This resets the values of the whole scorecard to 0
      */
     public void reset(){
         for (ScoreLine sL : getUpperSection())
-            sL.set_scoreValue(0);
+            sL.setScoreValue(0);
         for (ScoreLine sL : getOfAKinds())
-            sL.set_scoreValue(0);
+            sL.setScoreValue(0);
         if(getFullHouse() != null)
-            getFullHouse().set_scoreValue(0);
+            getFullHouse().setScoreValue(0);
         for (ScoreLine sL : getStraights())
-            sL.set_scoreValue(0);
-        getYahtzee().set_scoreValue(0);
-        getChance().set_scoreValue(0);
+            sL.setScoreValue(0);
+        getYahtzee().setScoreValue(0);
+        getChance().setScoreValue(0);
     }
 }
