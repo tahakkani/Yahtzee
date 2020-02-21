@@ -143,7 +143,7 @@ public class ScoreCard {
     /**
      * Calculates the total of the entire lower section of the scorecard.
      */
-    public void calc_totalLower(){
+    public void calcTotalLower(){
         for (ScoreLine sL : ofAKinds)
             totalLower += sL.getScoreValue();
         totalLower += fullHouse.getScoreValue();
