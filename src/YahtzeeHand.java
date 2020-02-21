@@ -1,4 +1,6 @@
 import java.util.ArrayList;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Scanner;
 
 /**
@@ -19,21 +21,18 @@ import java.util.Scanner;
  */
 public class YahtzeeHand {
 
-    private static int DICE_IN_PLAY;
-
     private ArrayList<YahtzeeDie> roll;
     //This ScoreCard is the hand's card used to display potential moves based on the current hand
     private ScoreCard possibleScores;
 
-    public YahtzeeHand(int numDice) {
-        DICE_IN_PLAY = YahtzeePlayer.DICE_IN_PLAY;
-        possibleScores = new ScoreCard(DICE_IN_PLAY, YahtzeeDie.NUM_SIDES);
-        for (int i = 0 ; i < DICE_IN_PLAY; i++)
+    public YahtzeeHand(int numSides, int diceInPlay) {
+        possibleScores = new ScoreCard(diceInPlay, numSides);
+        for (int i = 0; i < diceInPlay; i++)
             roll.add(new YahtzeeDie());
     }
 
     public static void main(String[] args) {
-        YahtzeeHand player1 = new YahtzeeHand(6);
+        YahtzeeHand nHand = new YahtzeeHand(6,5);
         Scanner kb = new Scanner(System.in);
         String playAgain = "y";
     }
@@ -57,7 +56,7 @@ public class YahtzeeHand {
      * the criteria for a straight, full house, yahtzee, etc
      *
      */
-    public void determine_possibleScores(){
+    public void determine_possibleScores(int diceInPlay){
         //upper scorecard
         for(ScoreLine sL : possibleScores.getUpperSection()){
             int currCount = 0;
@@ -89,7 +88,7 @@ public class YahtzeeHand {
         }
 
         //test for YAHTZEE, adds score
-        if (maxOfAKindFound() == DICE_IN_PLAY)
+        if (maxOfAKindFound() == diceInPlay)
             possibleScores.getYahtzee().setScoreValue(50);
 
         possibleScores.getChance().setScoreValue(totalAllDice());
@@ -105,11 +104,46 @@ public class YahtzeeHand {
         return total;
     }
 
+
+    /**
+     * This function basically implements the rolling part of the players turn. It allows player to keep dice
+     * by typing in a string of 'y' and 'n's. Displays the hand after each roll.
+     */
+    public void rollingPhase(int diceInPlay, int rollsPerTurn) {
+        Scanner kb = new Scanner(System.in);
+        StringBuilder keep = new StringBuilder();
+        System.out.println(keep);
+        for (int i = 0; i < diceInPlay; i++) {
+            addToHand(new YahtzeeDie());
+            keep.append("n");
+        }
+
+        //while there are still rolls left in the turn, re-roll all YahtzeeDie that were not kept
+        int rollNum = 1;
+        while (rollNum < rollsPerTurn && Objects.requireNonNull(keep).toString().contains("n")) {
+            //roll dice not kept
+            for (int dieNumber = 0; dieNumber < diceInPlay; dieNumber++) {
+                if (keep.charAt(dieNumber) != 'y')
+                    getFromHand(dieNumber).setSideUp();
+            }
+            //output roll
+            System.out.print("Your roll was: ");
+            displayRoll();
+
+            //if not the last roll of the hand prompt the user for dice to keep
+            if (rollNum <= rollsPerTurn) {
+                System.out.println("enter dice to keep (y or n) ");
+                keep = Optional.ofNullable(kb.nextLine()).map(StringBuilder::new).orElse(null);
+            }
+            rollNum++;
+        }
+    }
+
     /**
      * Takes the hand and orders the YahtzeeDie's based on their sideUp values. Is needed to determine if a straight
      * is acheived.
      */
-    public void sortAndDisplayHand() {
+    public void sortAndDisplayRoll() {
         boolean swap;
         YahtzeeDie temp;
 
@@ -126,15 +160,15 @@ public class YahtzeeHand {
         } while (swap);
 
         System.out.println("Here is your sorted hand : ");
-        displayHand();
+        displayRoll();
     }
 
     /**
      * Displays the sideUp values of the hand across the screen horizontally
      */
-    public void displayHand(){
-        for (int dieNumber = 0; dieNumber < DICE_IN_PLAY; dieNumber++)
-            System.out.print(roll.get(dieNumber).getSideUp() + " ");
+    public void displayRoll(){
+        for (YahtzeeDie i : roll)
+            System.out.print(i.getSideUp() + " ");
         System.out.println("\n");
     }
 

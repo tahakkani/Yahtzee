@@ -39,6 +39,24 @@ public class ScoreCard {
     }
 
     /**
+     * Constructor for a ScoreCard. The card is constructed dynamically as a function of how many dice are in play
+     * and how many sides are on a dice. These two parameters dictate what fields will appear on the card.
+     *
+     * @param diceInPlay is passed to this method from the YahtzeePlayer class.
+     * @param sidesOnDice is passed to the method from the YahtzeeDie class.
+     */
+    public ScoreCard(int diceInPlay, int sidesOnDice){
+        for(int i = 1; i < sidesOnDice + 1; i++)
+            upperSection.add(new ScoreLine(i + "", 0));
+        for(int i = 3; i < diceInPlay; i++)
+            ofAKinds.add(new ScoreLine(i + " of a Kind", 0));
+        for(int i = 4; i <= Math.min(diceInPlay, sidesOnDice); i++)
+            straights.add(new ScoreLine("Sequence of " + i, 0));
+        if (diceInPlay >= 5) //if full house is possible
+            fullHouse = new ScoreLine("Full House", 0);
+    }
+
+    /**
      * @return the lines on the upper section of the Yahtzee scorecard (as an ArrayList of ScoreLines)
      */
     public ArrayList<ScoreLine> getUpperSection(){return upperSection;}
@@ -67,24 +85,6 @@ public class ScoreCard {
      * @return the line on the "Chance" section of the Yahtzee scorecard (as a ScoreLine)
      */
     public ScoreLine getChance(){return chance;}
-
-    /**
-     * Constructor for a ScoreCard. The card is constructed dynamically as a function of how many dice are in play
-     * and how many sides are on a dice. These two parameters dictate what fields will appear on the card.
-     *
-     * @param diceInPlay is passed to this method from the YahtzeePlayer class.
-     * @param sidesOnDice is passed to the method from the YahtzeeDie class.
-     */
-    public ScoreCard(int diceInPlay, int sidesOnDice){
-        for(int i = 1; i < sidesOnDice + 1; i++)
-            upperSection.add(new ScoreLine(i + "", 0));
-        for(int i = 3; i < diceInPlay; i++)
-            ofAKinds.add(new ScoreLine(i + " of a Kind", 0));
-        for(int i = 4; i <= Math.min(diceInPlay, sidesOnDice); i++)
-            straights.add(new ScoreLine("Sequence of " + i, 0));
-        if (diceInPlay >= 5) //if full house is possible
-            fullHouse = new ScoreLine("Full House", 0);
-    }
 
     /**
      * Displays the entire card in an easily comprehensible format for the user.
