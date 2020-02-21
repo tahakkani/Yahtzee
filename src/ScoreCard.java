@@ -1,3 +1,4 @@
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 
 /**
@@ -32,6 +33,10 @@ public class ScoreCard {
     private int totalLower = 0;
     private int grandTotal = 0;
 
+    public static void main(String[] args) {
+        ScoreCard my = new ScoreCard(5, 6);
+        my.displayFullCard();
+    }
 
     /**
      * @return the lines on the upper section of the Yahtzee scorecard (as an ArrayList of ScoreLines)
@@ -85,24 +90,50 @@ public class ScoreCard {
      * Displays the entire card in an easily comprehensible format for the user.
      *
      */
-    public void displayCard() {
+    public void displayPossibilities() {
         //upper scorecard
         for (ScoreLine sL : getUpperSection())
-            sL.displayLine();
+            sL.displayLineOffer();
         for (ScoreLine sL : getOfAKinds())
-            sL.displayLine();
+            sL.displayLineOffer();
         if (getFullHouse() != null) //if full house is possible
-            getFullHouse().displayLine();
+            getFullHouse().displayLineOffer();
         for (ScoreLine sL : getStraights())
-            sL.displayLine();
-        getYahtzee().displayLine();
-        getChance().displayLine();
+            sL.displayLineOffer();
+        getYahtzee().displayLineOffer();
+        getChance().displayLineOffer();
+    }
+
+    public void displayFullCard(){
+        String divider = "------------------------";
+        String longDivider = "---------------------------------";
+        System.out.println("\n" + longDivider);
+        System.out.println("UPPER SECTION");
+        System.out.println(divider);
+        for (ScoreLine sL : getUpperSection())
+            sL.displayLineForFullCard();
+        System.out.printf(ScoreLine.displayFormat, "UPPER TOTAL:", totalUpper);
+        System.out.println(divider);
+        System.out.println("\nLOWER SECTION");
+        System.out.println(divider);
+        for (ScoreLine sL : getOfAKinds())
+            sL.displayLineForFullCard();
+        if (getFullHouse() != null) //if full house is possible
+            getFullHouse().displayLineForFullCard();
+        for (ScoreLine sL : getStraights())
+            sL.displayLineForFullCard();
+        getYahtzee().displayLineForFullCard();
+        getChance().displayLineForFullCard();
+        System.out.printf(ScoreLine.displayFormat,"LOWER TOTAL:", totalLower);
+        System.out.println(divider);
+        System.out.printf(ScoreLine.displayFormat,"GRAND TOTAL:", grandTotal);
+        System.out.println(longDivider + "\n");
     }
 
     /**
      * Calculates the total of the entire upper section of the scorecard, used for determining if a bonus is earned
      */
-    public void calc_totalUpper(){
+    public void calcTotalUpper(){
         for (ScoreLine sL : upperSection)
             totalUpper += sL.getScoreValue();
         if (totalUpper > 62)

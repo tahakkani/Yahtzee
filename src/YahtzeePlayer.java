@@ -24,13 +24,12 @@ import java.util.Scanner;
  */
 public class YahtzeePlayer {
 
-    private static int DICE_IN_PLAY;
+    protected static int DICE_IN_PLAY;
     private static int ROLLS_PER_TURN;
-    private ArrayList<YahtzeeDie> hand;
+    private YahtzeeHand hand;
     //This ScoreCard is the player's official score card for the game
     private ScoreCard scores;
-    //This ScoreCard is the player's card used to display potential moves based on the current hand
-    private ScoreCard possibleScores;
+
 
     public static void main(String[] args) {
         YahtzeePlayer player1 = new YahtzeePlayer();
@@ -43,53 +42,52 @@ public class YahtzeePlayer {
             playAgain = kb.next();
         }
     }
-    public void scoreOnLine(){
-        possibleScores.displayCard();
+
+    public void scoreOnLine() {
         Scanner kb = new Scanner(System.in);
         boolean lineFound = false;
-        while(!lineFound) {
+        while (!lineFound) {
             System.out.println("Please enter the title of the line that you would like to score on: ");
             String entry = kb.nextLine();
-            ScoreLine newEntryLine = possibleScores.findLine(entry);
-            if(newEntryLine != null){
+            ScoreLine newEntryLine = scores.findLine(entry);
+            if (newEntryLine != null) {
                 scores.findLine(entry).setScoreValue(newEntryLine.getScoreValue());
                 lineFound = true;
-            }
-            else
+            } else
                 System.out.println("That line was not found!");
         }
     }
 
-    public void askToDisplayScorecard(){
-        System.out.println("Would you like to see your scorecard?"  );
+    public void askToDisplayScorecard() {
+        System.out.println("Would you like to see your scorecard?");
         Scanner kb = new Scanner(System.in);
-        if(kb.nextLine() == "y");
-            scores.displayCard();
+        if (kb.nextLine() == "y") ;
+        scores.displayPossibilities();
     }
-    public void takeTurn(){
+
+    public void takeTurn() {
         askToDisplayScorecard();
         rollingPhase();
         //start scoring
         //hand needs to be sorted to check for straights
-        sortAndDisplayHand();
-        determine_possibleScores();
+        hand.sortAndDisplayHand();
+        hand.determine_possibleScores();
         //possibleScores.displayCard();
         scoreOnLine();
         askToDisplayScorecard();
-        hand.clear();
-        possibleScores.reset();
+        hand.clearHand();
     }
 
-    public YahtzeePlayer(){
+    public YahtzeePlayer() {
         gameInit();
         scores = new ScoreCard(DICE_IN_PLAY, YahtzeeDie.NUM_SIDES);
-        hand = new ArrayList<>();
-        possibleScores = new ScoreCard(DICE_IN_PLAY, YahtzeeDie.NUM_SIDES);
+        hand = new YahtzeeHand(DICE_IN_PLAY);
     }
+
     /**
      * Finds the file, opens it, reads the values and
      */
-    private void gameInit(){
+    private void gameInit() {
         //load data from "yahtzeeConfig.txt" into an ArrayList
         Scanner inFile;
         ArrayList<Integer> configValues = new ArrayList<>();
@@ -97,7 +95,7 @@ public class YahtzeePlayer {
 
         try {
             inFile = new Scanner(new File("yahtzeeConfig.txt"));
-            while (inFile.hasNextLine())    {
+            while (inFile.hasNextLine()) {
                 configValues.add(Integer.parseInt(inFile.nextLine()));
             }
         } catch (FileNotFoundException e) {
@@ -115,14 +113,13 @@ public class YahtzeePlayer {
 
         //if the user wants to edit the config, allow them to enter values for die sides, die number, and
         //rolls per hand
-        if (Objects.equals(editConfig, "y")){
+        if (Objects.equals(editConfig, "y")) {
             configValues.clear();
             System.out.println("Enter the number of sides you want on each die: ");
 
-            try{
+            try {
                 configValues.add(Integer.parseInt(kb.nextLine()));
-            }
-            catch(NumberFormatException e) {
+            } catch (NumberFormatException e) {
                 System.out.println("That is not a valid entry");
             }
             System.out.println("Enter the number of dice in play: ");
@@ -152,12 +149,12 @@ public class YahtzeePlayer {
      * This function basically implements the rolling part of the players turn. It allows player to keep dice
      * by typing in a string of 'y' and 'n's. Displays the hand after each roll.
      */
-    public void rollingPhase(){
+    public void rollingPhase() {
         Scanner kb = new Scanner(System.in);
         StringBuilder keep = new StringBuilder();
         System.out.println(keep);
-        for (int i = 0; i < DICE_IN_PLAY; i++){
-            hand.add(new YahtzeeDie());
+        for (int i = 0; i < DICE_IN_PLAY; i++) {
+            hand.addToHand(new YahtzeeDie());
             keep.append("n");
         }
 
@@ -167,11 +164,11 @@ public class YahtzeePlayer {
             //roll dice not kept
             for (int dieNumber = 0; dieNumber < DICE_IN_PLAY; dieNumber++) {
                 if (keep.charAt(dieNumber) != 'y')
-                    hand.get(dieNumber).setSideUp();
+                    hand.getFromHand(dieNumber).setSideUp();
             }
             //output roll
             System.out.print("Your roll was: ");
-            displayHand();
+            hand.displayHand();
 
             //if not the last roll of the hand prompt the user for dice to keep
             if (roll <= ROLLS_PER_TURN) {
@@ -181,164 +178,4 @@ public class YahtzeePlayer {
             roll++;
         }
     }
-
-
-    /**
-     * This is called after each turn of rolling to determine for the player on which lines they can score and
-     * how much they will score on that line. Uses other functions in this class to determine if the hand meets
-     * the criteria for a straight, full house, yahtzee, etc
-     *
-     */
-    public void determine_possibleScores(){
-        //upper scorecard
-        for(ScoreLine sL : possibleScores.getUpperSection()){
-            int currCount = 0;
-            int dieValue = possibleScores.getUpperSection().indexOf(sL) + 1;
-            for(YahtzeeDie yD : hand){
-                if(yD.getSideUp() == (dieValue))
-                    currCount++;
-            }
-            sL.setScoreValue(dieValue * currCount);
-        }
-
-        //lower scorecard
-        //find max of a kind
-        for (ScoreLine sL : possibleScores.getOfAKinds()){
-            if (maxOfAKindFound() >= possibleScores.getOfAKinds().indexOf(sL) + 3)
-                sL.setScoreValue(totalAllDice());
-        }
-
-        ///full house
-        if (fullHouseFound())
-            possibleScores.getFullHouse().setScoreValue(25);
-
-        //test for all possible straights
-        for (ScoreLine currLine : possibleScores.getStraights()) {
-            int currIndex = possibleScores.getStraights().indexOf(currLine);
-            //if max straight is greater than or equal to what we can count in the current line
-            if (maxStraightFound() >= currIndex + 4)
-                currLine.setScoreValue((currIndex + 3) * 10);
-        }
-
-        //test for YAHTZEE, adds score
-        if (maxOfAKindFound() == DICE_IN_PLAY)
-            possibleScores.getYahtzee().setScoreValue(50);
-
-        possibleScores.getChance().setScoreValue(totalAllDice());
-    }
-
-    /**
-     * this function returns the total value of all dice in hand
-     */
-    int totalAllDice(){
-        int total = 0;
-        for (YahtzeeDie yD : hand) {
-            total += yD.getSideUp();
-        }
-        return total;
-    }
-
-    /**
-     * Takes the hand and orders the YahtzeeDie's based on their sideUp values. Is needed to determine if a straight
-     * is acheived.
-     */
-    public void sortAndDisplayHand() {
-        boolean swap;
-        YahtzeeDie temp;
-
-        do {
-            swap = false;
-            for (int count = 0; count < (hand.size() - 1); count++) {
-                if (hand.get(count).getSideUp() > hand.get(count + 1).getSideUp()) {
-                    temp = hand.get(count);
-                    hand.set(count, hand.get(count + 1));
-                    hand.set(count + 1, temp);
-                    swap = true;
-                }
-            }
-        } while (swap);
-
-        System.out.println("Here is your sorted hand : ");
-        displayHand();
-    }
-
-    /**
-     * Displays the sideUp values of the hand across the screen horizontally
-     */
-    public void displayHand(){
-        for (int dieNumber = 0; dieNumber < DICE_IN_PLAY; dieNumber++)
-            System.out.print(hand.get(dieNumber).getSideUp() + " ");
-        System.out.println("\n");
-    }
-
-    /**
-     * this function returns the count of the die value occurring most in the hand but not the value itself
-     *
-     * @return the highest number of a single YahtzeeDie value in the hand
-     */
-
-    public int maxOfAKindFound() {
-        int maxCount = 0;
-        int currentCount;
-
-        for (int dieValue = 1; dieValue <= YahtzeeDie.NUM_SIDES; dieValue++) {
-            currentCount = 0;
-            for (YahtzeeDie yahtzeeDie : hand) {
-                if (yahtzeeDie.getSideUp() == dieValue)
-                    currentCount++;
-            }
-            if (currentCount > maxCount)
-                maxCount = currentCount;
-        }
-        return maxCount;
-    }
-
-    /**
-     * this function returns the length of the longest
-     * straight found in a hand, hand must be sorted beforehand
-     *
-     * @return the highest straight found in the hand
-     */
-    public int maxStraightFound() {
-        int maxLength = 1;
-        int curLength = 1;
-        for(int counter = 0; counter < hand.size() - 1; counter++) {
-            if (hand.get(counter).getSideUp() + 1 == hand.get(counter + 1).getSideUp()) //jump of 1
-                curLength++;
-            else if (hand.get(counter).getSideUp() + 1 < hand.get(counter + 1).getSideUp()) //jump of >= 2
-                curLength = 1;
-            if (curLength > maxLength)
-                maxLength = curLength;
-        }
-        return maxLength;
-    }
-
-    /**
-     * this function returns true if the hand is a full house
-     * or false if it does not
-     *
-     * @return whether a full house was found or not
-     */
-
-    public boolean fullHouseFound() {
-        boolean foundFH = false;
-        boolean found3K = false;
-        boolean found2K = false;
-        int currentCount ;
-        for (int dieValue = 1; dieValue <= YahtzeeDie.NUM_SIDES; dieValue++) {
-            currentCount = 0;
-            for (YahtzeeDie yahtzeeDie : hand) {
-                if (yahtzeeDie.getSideUp() == dieValue)
-                    currentCount++;
-            }
-            if (currentCount == 2)
-                found2K = true;
-            if (currentCount == 3)
-                found3K = true;
-        }
-        if (found2K && found3K)
-            foundFH = true;
-        return foundFH;
-    }
 }
-
