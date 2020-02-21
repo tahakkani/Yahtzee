@@ -49,6 +49,7 @@ public class YahtzeeHand {
      * how much they will score on that line. Uses other functions in this class to determine if the hand meets
      * the criteria for a straight, full house, yahtzee, etc
      *
+     * @param diceInPlay how many dice there are
      */
     public void determine_possibleScores(int diceInPlay){
         //upper scorecard
@@ -102,6 +103,9 @@ public class YahtzeeHand {
     /**
      * This function basically implements the rolling part of the players turn. It allows player to keep dice
      * by typing in a string of 'y' and 'n's. Displays the hand after each roll.
+     *
+     * @param diceInPlay how many dice there are
+     * @param rollsPerTurn how many rolls per turn there are
      */
     public void rollingPhase(int diceInPlay, int rollsPerTurn) {
         Scanner kb = new Scanner(System.in);
