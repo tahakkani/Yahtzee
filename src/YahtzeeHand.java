@@ -21,7 +21,7 @@ import java.util.Scanner;
  */
 public class YahtzeeHand {
 
-    private ArrayList<YahtzeeDie> roll;
+    private ArrayList<YahtzeeDie> roll = new ArrayList<>();
     //This ScoreCard is the hand's card used to display potential moves based on the current hand
     private ScoreCard possibleScores;
 
@@ -29,12 +29,6 @@ public class YahtzeeHand {
         possibleScores = new ScoreCard(diceInPlay, numSides);
         for (int i = 0; i < diceInPlay; i++)
             roll.add(new YahtzeeDie());
-    }
-
-    public static void main(String[] args) {
-        YahtzeeHand nHand = new YahtzeeHand(6,5);
-        Scanner kb = new Scanner(System.in);
-        String playAgain = "y";
     }
 
     public void clearHand(){
@@ -122,19 +116,16 @@ public class YahtzeeHand {
         int rollNum = 1;
         while (rollNum < rollsPerTurn && Objects.requireNonNull(keep).toString().contains("n")) {
             //roll dice not kept
-            for (int dieNumber = 0; dieNumber < diceInPlay; dieNumber++) {
+            for (int dieNumber = 0; dieNumber < diceInPlay; dieNumber++)
                 if (keep.charAt(dieNumber) != 'y')
                     getFromHand(dieNumber).setSideUp();
-            }
             //output roll
             System.out.print("Your roll was: ");
             displayRoll();
 
             //if not the last roll of the hand prompt the user for dice to keep
-            if (rollNum <= rollsPerTurn) {
-                System.out.println("enter dice to keep (y or n) ");
-                keep = Optional.ofNullable(kb.nextLine()).map(StringBuilder::new).orElse(null);
-            }
+            System.out.println("enter dice to keep (y or n) ");
+            keep = Optional.ofNullable(kb.nextLine()).map(StringBuilder::new).orElse(null);
             rollNum++;
         }
     }

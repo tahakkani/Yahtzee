@@ -19,8 +19,10 @@ public class YahtzeeGame {
         for (int i = 0; i < PLAYERS; i++)
             players.add(new YahtzeePlayer(YahtzeeDie.NUM_SIDES, DICE_IN_PLAY));
         //do this while players still have stuff in their scorecards
-        for (YahtzeePlayer player : players)
-            player.takeTurn(DICE_IN_PLAY, ROLLS_PER_TURN);
+        for (YahtzeePlayer player : players){
+            if (!player.getScores().isFull())
+                player.takeTurn(DICE_IN_PLAY, ROLLS_PER_TURN);
+        }
     }
 
     public YahtzeeGame(){

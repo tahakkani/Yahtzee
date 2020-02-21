@@ -19,15 +19,17 @@ public class ScoreCard {
 
     //The following fields constitute the lines that can be scored on in a Yahtzee scorecard
     private ArrayList<ScoreLine> upperSection = new ArrayList<>();
+    private ScoreLine upperBonus = new ScoreLine("Upper Bonus:",0);
     private ArrayList<ScoreLine> ofAKinds = new ArrayList<>();
     private ScoreLine fullHouse = null;
     private ArrayList<ScoreLine> straights = new ArrayList<>();
     private ScoreLine yahtzee = new ScoreLine("YAHTZEE", 0);
     private ScoreLine chance = new ScoreLine("Chance", 0);
+    private ScoreLine yahtzeeBonus = new ScoreLine("YAHTZEE BONUS", 0);
 
     //This field keeps track of how many extra Yahtzees are scored, adding 100 points each
     private int bonusYahtzees = 0;
-
+    private boolean gotUpperBonus = false;
     // the following fields reflect scorecard totals
     private int totalUpper = 0;
     private int totalLower = 0;
@@ -56,6 +58,18 @@ public class ScoreCard {
             fullHouse = new ScoreLine("Full House", 0);
     }
 
+    public boolean isFull(){
+        for (ScoreLine sL : getUpperSection())
+            if (!sL.isUsed()) return false;
+        for (ScoreLine sL : getOfAKinds())
+            if (!sL.isUsed()) return false;
+        if(getFullHouse() != null)
+            if (!getFullHouse().isUsed()) return false;
+        for (ScoreLine sL : getStraights())
+            if (!sL.isUsed()) return false;
+        if (!getYahtzee().isUsed()) return false;
+        return getChance().isUsed();
+    }
     /**
      * @return the lines on the upper section of the Yahtzee scorecard (as an ArrayList of ScoreLines)
      */
@@ -137,7 +151,8 @@ public class ScoreCard {
         for (ScoreLine sL : upperSection)
             totalUpper += sL.getScoreValue();
         if (totalUpper > 62)
-            addUpperBonus();
+            gotUpperBonus = true;
+
     }
 
     /**

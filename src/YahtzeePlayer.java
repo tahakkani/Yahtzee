@@ -28,6 +28,10 @@ public class YahtzeePlayer {
         hand = new YahtzeeHand(numSides, diceInPlay);
     }
 
+    public ScoreCard getScores() {
+        return scores;
+    }
+
     public static void main(String[] args) {
         int numSides = 6;
         int diceInPlay = 5;
@@ -61,7 +65,7 @@ public class YahtzeePlayer {
     public void askToDisplayScorecard() {
         System.out.println("Would you like to see your scorecard?");
         Scanner kb = new Scanner(System.in);
-        if (kb.nextLine() == "y")
+        if (kb.nextLine().equals("y"))
             scores.displayPossibilities();
     }
 
