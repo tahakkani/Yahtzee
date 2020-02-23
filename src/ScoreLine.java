@@ -1,5 +1,3 @@
-import java.sql.SQLOutput;
-
 /**
  * This class is the backbone of the ScoreCard class. Having a separate ScoreLine class allows for a dynamic
  * construction of score cards based on a number of factors (number of sides on the YahtzeeDie, how many dice are
@@ -71,8 +69,7 @@ public class ScoreLine {
         return title;
     }
 
-    public void setUsed(boolean used){ isUsed = used; }
-
+    public void setUsed(boolean used){ isUsed = used;}
     public boolean isUsed() { return isUsed; }
     /**
      * Displays the possible score on a single line in a readable and interpretable manner.

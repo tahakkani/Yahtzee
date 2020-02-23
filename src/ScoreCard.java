@@ -1,4 +1,3 @@
-import java.sql.SQLOutput;
 import java.util.ArrayList;
 
 /**
@@ -29,7 +28,6 @@ public class ScoreCard {
 
     //This field keeps track of how many extra Yahtzees are scored, adding 100 points each
     private int bonusYahtzees = 0;
-    private boolean gotUpperBonus = false;
     // the following fields reflect scorecard totals
     private int totalUpper = 0;
     private int totalLower = 0;
@@ -39,6 +37,8 @@ public class ScoreCard {
         ScoreCard my = new ScoreCard(5, 6);
         my.displayFullCard();
     }
+
+    public int getBonusYahtzees(){ return bonusYahtzees; }
 
     /**
      * Constructor for a ScoreCard. The card is constructed dynamically as a function of how many dice are in play
@@ -100,22 +100,29 @@ public class ScoreCard {
      */
     public ScoreLine getChance(){return chance;}
 
-    /**
+   /**
      * Displays the entire card in an easily comprehensible format for the user.
      *
      */
     public void displayPossibilities() {
         //upper scorecard
         for (ScoreLine sL : getUpperSection())
-            sL.displayLineOffer();
+            if (!sL.isUsed())
+                sL.displayLineOffer();
         for (ScoreLine sL : getOfAKinds())
-            sL.displayLineOffer();
-        if (getFullHouse() != null) //if full house is possible
+            if (!sL.isUsed())
+                sL.displayLineOffer();
+        if (getFullHouse() != null && !getFullHouse().isUsed()) //if full house is possible
             getFullHouse().displayLineOffer();
         for (ScoreLine sL : getStraights())
-            sL.displayLineOffer();
-        getYahtzee().displayLineOffer();
-        getChance().displayLineOffer();
+            if (!sL.isUsed())
+                sL.displayLineOffer();
+        if (!getYahtzee().isUsed())
+            getYahtzee().displayLineOffer();
+        else
+            getYahtzeeBonus().displayLineOffer();
+        if (!getChance().isUsed())
+            getChance().displayLineOffer();
     }
 
     public void displayFullCard(){
@@ -126,6 +133,7 @@ public class ScoreCard {
         System.out.println(divider);
         for (ScoreLine sL : getUpperSection())
             sL.displayLineForFullCard();
+        calcTotalUpper();
         System.out.printf(ScoreLine.displayFormat, "UPPER TOTAL:", totalUpper);
         System.out.println(divider);
         System.out.println("\nLOWER SECTION");
@@ -138,36 +146,41 @@ public class ScoreCard {
             sL.displayLineForFullCard();
         getYahtzee().displayLineForFullCard();
         getChance().displayLineForFullCard();
+        getYahtzeeBonus().displayLineForFullCard();
+        calcTotalLower();
         System.out.printf(ScoreLine.displayFormat,"LOWER TOTAL:", totalLower);
         System.out.println(divider);
+        calcGrandTotal();
         System.out.printf(ScoreLine.displayFormat,"GRAND TOTAL:", grandTotal);
         System.out.println(longDivider + "\n");
     }
-
     /**
      * Calculates the total of the entire upper section of the scorecard, used for determining if a bonus is earned
      */
     public void calcTotalUpper(){
+        int total = 0;
         for (ScoreLine sL : upperSection)
-            totalUpper += sL.getScoreValue();
+            total += sL.getScoreValue();
+        totalUpper = total;
         if (totalUpper > 62)
-            gotUpperBonus = true;
-
+            totalUpper+= 35;
     }
 
     /**
      * Calculates the total of the entire lower section of the scorecard.
      */
     public void calcTotalLower(){
+        int total = 0;
         for (ScoreLine sL : ofAKinds)
-            totalLower += sL.getScoreValue();
-        totalLower += fullHouse.getScoreValue();
+            total += sL.getScoreValue();
+        total += fullHouse.getScoreValue();
         for (ScoreLine sL : straights)
-            totalLower += sL.getScoreValue();
-        totalLower += yahtzee.getScoreValue();
-        totalLower += chance.getScoreValue();
+            total += sL.getScoreValue();
+        total += yahtzee.getScoreValue();
+        total += chance.getScoreValue();
         for (int i = 0; i < bonusYahtzees; i++)
-            addYahtzeeBonus();
+            total += 100;
+        totalLower = total;
     }
 
     /**
@@ -177,40 +190,24 @@ public class ScoreCard {
         grandTotal = totalLower + totalUpper;
     }
 
-    /**
-     * This method adds a bonus of 35 points to the scorecard once the card is initially totaled. Should only
-     * be called at the end of the game.
-     */
-    private void addUpperBonus() {
-        totalUpper += 35;
-    }
-
-    /**
-     * This adds a bonus of 100 points for every extra Yahtzee that the player gets
-     */
-    private void addYahtzeeBonus(){
-        totalLower += 100;
-    }
-
-
     public ScoreLine findLine(String title){
         for (ScoreLine sL : getUpperSection())
-            if (title.equals(sL.getTitle())) return sL;
+            if (title.equals(sL.getTitle()) && !sL.isUsed()) return sL;
         for (ScoreLine sL : getOfAKinds())
-            if (title.equals(sL.getTitle())) return sL;
+            if (title.equals(sL.getTitle()) && !sL.isUsed()) return sL;
         if(getFullHouse() != null)
-            if (title.equals(getFullHouse().getTitle())) return getFullHouse();
+            if (title.equals(getFullHouse().getTitle()) && !getFullHouse().isUsed()) return getFullHouse();
         for (ScoreLine sL : getStraights())
-            if (title.equals(sL.getTitle())) return sL;
-        if (title.equals(getYahtzee().getTitle())) return getYahtzee();
-        if (title.equals(getChance().getTitle())) return getChance();
+            if (title.equals(sL.getTitle()) && !sL.isUsed()) return sL;
+        if (title.equals(getYahtzee().getTitle()) && !getYahtzee().isUsed()) return getYahtzee();
+        if (title.equals(getChance().getTitle()) && !getChance().isUsed()) return getChance();
         return null;
     }
 
     /**
      * This resets the values of the whole scorecard to 0
      */
-    public void reset(){
+    public void resetValues(){
         for (ScoreLine sL : getUpperSection())
             sL.setScoreValue(0);
         for (ScoreLine sL : getOfAKinds())
@@ -221,5 +218,21 @@ public class ScoreCard {
             sL.setScoreValue(0);
         getYahtzee().setScoreValue(0);
         getChance().setScoreValue(0);
+    }
+
+    public ScoreLine getYahtzeeBonus() {
+        return yahtzeeBonus;
+    }
+
+    public void setYahtzeeBonus(ScoreLine yahtzeeBonus) {
+        this.yahtzeeBonus = yahtzeeBonus;
+    }
+
+    public ScoreLine getUpperBonus() {
+        return upperBonus;
+    }
+
+    public void setUpperBonus(ScoreLine upperBonus) {
+        this.upperBonus = upperBonus;
     }
 }

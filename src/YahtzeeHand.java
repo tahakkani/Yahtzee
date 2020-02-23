@@ -27,14 +27,14 @@ public class YahtzeeHand {
 
     public YahtzeeHand(int numSides, int diceInPlay) {
         possibleScores = new ScoreCard(diceInPlay, numSides);
-        for (int i = 0; i < diceInPlay; i++)
-            roll.add(new YahtzeeDie());
     }
 
     public void clearHand(){
         roll.clear();
-        possibleScores.reset();
+        possibleScores.resetValues();
     }
+
+    public ScoreCard getPossibleScores(){ return possibleScores; }
 
     public YahtzeeDie getFromHand(int dieIndex){
         return roll.get(dieIndex);
@@ -84,10 +84,13 @@ public class YahtzeeHand {
 
         //test for YAHTZEE, adds score
         if (maxOfAKindFound() == diceInPlay)
-            possibleScores.getYahtzee().setScoreValue(50);
-
+            if(possibleScores.getYahtzee().isUsed())
+                possibleScores.getYahtzeeBonus().setScoreValue(100);
+            else
+                possibleScores.getYahtzee().setScoreValue(50);
         possibleScores.getChance().setScoreValue(totalAllDice());
     }
+
     /**
      * this function returns the total value of all dice in hand
      */

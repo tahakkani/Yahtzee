@@ -27,10 +27,6 @@ public class ObjectOfChance {
         setSideUp();
     }
 
-    public static void main(String[] args) {
-        ObjectOfChance my = new ObjectOfChance();
-        System.out.println(my.sideUp);
-    }
     /**
      * @return the integer that the object of chance landed on
      */

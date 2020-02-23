@@ -1,7 +1,6 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Scanner;
@@ -10,19 +9,11 @@ public class YahtzeeGame {
 
     private static int DICE_IN_PLAY;
     private static int ROLLS_PER_TURN;
-    private static int PLAYERS = 1;
+    private ArrayList<YahtzeePlayer> players = new ArrayList<>();
 
     public static void main(String[] args) {
         YahtzeeGame newGame = new YahtzeeGame();
-        ArrayList<YahtzeePlayer> players = new ArrayList<>();
-
-        for (int i = 0; i < PLAYERS; i++)
-            players.add(new YahtzeePlayer(YahtzeeDie.NUM_SIDES, DICE_IN_PLAY));
-        //do this while players still have stuff in their scorecards
-        for (YahtzeePlayer player : players){
-            if (!player.getScores().isFull())
-                player.takeTurn(DICE_IN_PLAY, ROLLS_PER_TURN);
-        }
+        newGame.playGame();
     }
 
     public YahtzeeGame(){
@@ -31,6 +22,22 @@ public class YahtzeeGame {
         YahtzeeDie.NUM_SIDES = config.get(0);
         DICE_IN_PLAY = config.get(1);
         ROLLS_PER_TURN = config.get(2);
+        int PLAYERS = 1;
+        for (int i = 0; i < PLAYERS; i++)
+            players.add(new YahtzeePlayer(YahtzeeDie.NUM_SIDES, DICE_IN_PLAY));
+    }
+
+    public void playGame(){
+        boolean gameOver = false;
+        //do this while players still have stuff in their scorecards
+        while (!gameOver) {
+            for (YahtzeePlayer player : players){
+                if (!player.getScores().isFull()){
+                    player.takeTurn(DICE_IN_PLAY, ROLLS_PER_TURN);
+                }
+                else gameOver = true;
+            }
+        }
     }
     /**
      * Finds the file, opens it, reads the values and
@@ -46,10 +53,10 @@ public class YahtzeeGame {
             while (inFile.hasNextLine()) {
                 configValues.add(Integer.parseInt(inFile.nextLine()));
             }
-        } catch (FileNotFoundException e) {
+        }   catch (FileNotFoundException e) {
             e.printStackTrace();
             System.out.println("File not found");
-        }
+            }
 
         //display data from "yahtzeeConfig.txt" in an easy-to-read manner
         System.out.println(configValues);

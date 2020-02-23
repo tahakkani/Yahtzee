@@ -16,6 +16,9 @@ public class YahtzeeDie extends ObjectOfChance{
 
     private boolean isKept = false;
 
+    public YahtzeeDie(){
+        setKept(true);
+    }
     /**
      * Getter for <code>boolean</code> isKept.
      *

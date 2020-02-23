@@ -24,7 +24,7 @@ public class YahtzeePlayer {
     private ScoreCard scores;
 
     public YahtzeePlayer(int numSides, int diceInPlay) {
-        scores = new ScoreCard(numSides, diceInPlay);
+        scores = new ScoreCard(diceInPlay, numSides);
         hand = new YahtzeeHand(numSides, diceInPlay);
     }
 
@@ -47,26 +47,28 @@ public class YahtzeePlayer {
         }
     }
 
+
+    public void askToDisplayScorecard() {
+        System.out.println("Would you like to see your scorecard?");
+        Scanner kb = new Scanner(System.in);
+        if (kb.nextLine().equals("y"))
+            scores.displayFullCard();
+    }
+
     public void scoreOnLine() {
         Scanner kb = new Scanner(System.in);
         boolean lineFound = false;
         while (!lineFound) {
             System.out.println("Please enter the title of the line that you would like to score on: ");
             String entry = kb.nextLine();
-            ScoreLine newEntryLine = scores.findLine(entry);
+            ScoreLine newEntryLine = hand.getPossibleScores().findLine(entry);
             if (newEntryLine != null) {
                 scores.findLine(entry).setScoreValue(newEntryLine.getScoreValue());
+                newEntryLine.setUsed(true);
                 lineFound = true;
             } else
-                System.out.println("That line was not found!");
+                System.out.println("That line was not found! (You may have scored there earlier)");
         }
-    }
-
-    public void askToDisplayScorecard() {
-        System.out.println("Would you like to see your scorecard?");
-        Scanner kb = new Scanner(System.in);
-        if (kb.nextLine().equals("y"))
-            scores.displayPossibilities();
     }
 
     public void takeTurn(int diceInPlay, int rollsPerTurn) {
@@ -76,6 +78,7 @@ public class YahtzeePlayer {
         //hand needs to be sorted to check for straights
         hand.sortAndDisplayRoll();
         hand.determine_possibleScores(diceInPlay);
+        hand.getPossibleScores().displayPossibilities();
         //possibleScores.displayCard();
         scoreOnLine();
         hand.clearHand();
