@@ -63,8 +63,12 @@ public class YahtzeePlayer {
             String entry = kb.nextLine();
             ScoreLine newEntryLine = hand.getPossibleScores().findLine(entry);
             if (newEntryLine != null) {
-                scores.findLine(entry).setScoreValue(newEntryLine.getScoreValue());
-                newEntryLine.setUsed(true);
+                if (!newEntryLine.equals(hand.getPossibleScores().getYahtzeeBonus())){
+                    scores.findLine(entry).setScoreValue(newEntryLine.getScoreValue());
+                    newEntryLine.setUsed(true); //prevents line from being used again
+                }
+                else
+                    scores.addBonusYahtzee();
                 lineFound = true;
             } else
                 System.out.println("That line was not found! (You may have scored there earlier)");

@@ -40,6 +40,8 @@ public class ScoreCard {
 
     public int getBonusYahtzees(){ return bonusYahtzees; }
 
+    public void addBonusYahtzee(){ bonusYahtzees += 1; }
+
     /**
      * Constructor for a ScoreCard. The card is constructed dynamically as a function of how many dice are in play
      * and how many sides are on a dice. These two parameters dictate what fields will appear on the card.
@@ -146,6 +148,7 @@ public class ScoreCard {
             sL.displayLineForFullCard();
         getYahtzee().displayLineForFullCard();
         getChance().displayLineForFullCard();
+        calcYahtzeeBonus();
         getYahtzeeBonus().displayLineForFullCard();
         calcTotalLower();
         System.out.printf(ScoreLine.displayFormat,"LOWER TOTAL:", totalLower);
@@ -153,6 +156,10 @@ public class ScoreCard {
         calcGrandTotal();
         System.out.printf(ScoreLine.displayFormat,"GRAND TOTAL:", grandTotal);
         System.out.println(longDivider + "\n");
+    }
+
+    public void calcYahtzeeBonus(){
+        yahtzeeBonus.setScoreValue(bonusYahtzees * 100);
     }
     /**
      * Calculates the total of the entire upper section of the scorecard, used for determining if a bonus is earned
@@ -201,6 +208,7 @@ public class ScoreCard {
             if (title.equals(sL.getTitle()) && !sL.isUsed()) return sL;
         if (title.equals(getYahtzee().getTitle()) && !getYahtzee().isUsed()) return getYahtzee();
         if (title.equals(getChance().getTitle()) && !getChance().isUsed()) return getChance();
+        if (title.equals(getYahtzeeBonus().getTitle())) return getYahtzeeBonus();
         return null;
     }
 

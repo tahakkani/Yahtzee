@@ -85,7 +85,7 @@ public class YahtzeeHand {
         //test for YAHTZEE, adds score
         if (maxOfAKindFound() == diceInPlay)
             if(possibleScores.getYahtzee().isUsed())
-                possibleScores.getYahtzeeBonus().setScoreValue(100);
+                possibleScores.getYahtzeeBonus().setScoreValue((possibleScores.getBonusYahtzees() + 1) * 100);
             else
                 possibleScores.getYahtzee().setScoreValue(50);
         possibleScores.getChance().setScoreValue(totalAllDice());
