@@ -1,4 +1,11 @@
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintStream;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Objects;
+import java.util.Scanner;
 
 /**
  * This class implements a Yahtzee score card. It is composed of several scorelines (both in ArrayList and individual
@@ -33,9 +40,12 @@ public class ScoreCard {
     private int totalLower = 0;
     private int grandTotal = 0;
 
+    //used to delimit parts of ScoreCard text file
+    private String delim = ",";
     public static void main(String[] args) {
         ScoreCard my = new ScoreCard(5, 6);
         my.displayFullCard();
+        my.createScorecard();
     }
 
     public int getBonusYahtzees(){ return bonusYahtzees; }
@@ -60,6 +70,48 @@ public class ScoreCard {
             fullHouse = new ScoreLine("Full House", 0);
     }
 
+    private void readScorecard(){
+        //load data from "scorecard.txt" into a Scorecard
+        Scanner inFile;
+
+        try {
+            inFile = new Scanner(new File("yahtzeeConfig.txt"));
+            while (inFile.hasNextLine()) {
+                String line = inFile.nextLine();
+                String ln[] = line.split(delim);
+                scoreCard.add(Arrays.asList(ln));
+            }
+        }   catch (FileNotFoundException e) {
+            e.printStackTrace();
+            System.out.println("File not found");
+        }
+    }
+    private void createScorecard(){
+        //load data from scores into "scorecard.txt"
+        PrintStream outFile = null;
+
+        try {
+            outFile = new PrintStream(new File("scorecard.txt"));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        //maybe clear file before writing
+        for (ScoreLine sL : getUpperSection())
+            Objects.requireNonNull(outFile).println(sL.getTitle() + delim + sL.isUsed() + delim + sL.getScoreValue());
+        for (ScoreLine sL : getOfAKinds())
+            Objects.requireNonNull(outFile).println(sL.getTitle() + delim + sL.isUsed() + delim + sL.getScoreValue());
+        if(getFullHouse() != null)
+            Objects.requireNonNull(outFile).println(getFullHouse().getTitle() + delim + getFullHouse().isUsed()
+                    + delim + getFullHouse().getScoreValue());
+        for (ScoreLine sL : getStraights())
+            Objects.requireNonNull(outFile).println(sL.getTitle() + delim + sL.isUsed() + delim + sL.getScoreValue());
+
+        Objects.requireNonNull(outFile).println(getYahtzee().getTitle() + delim + getYahtzee().isUsed()
+                + delim + getYahtzee().getScoreValue());
+
+        Objects.requireNonNull(outFile).close();
+    }
     public boolean isFull(){
         for (ScoreLine sL : getUpperSection())
             if (!sL.isUsed()) return false;

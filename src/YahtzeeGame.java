@@ -39,6 +39,7 @@ public class YahtzeeGame {
             }
         }
     }
+
     /**
      * Finds the file, opens it, reads the values and
      */
