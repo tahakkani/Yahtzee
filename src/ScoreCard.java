@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Scanner;
+import java.util.regex.Pattern;
 
 /**
  * This class implements a Yahtzee score card. It is composed of several scorelines (both in ArrayList and individual
@@ -45,7 +46,8 @@ public class ScoreCard {
     public static void main(String[] args) {
         ScoreCard my = new ScoreCard(5, 6);
         my.displayFullCard();
-        my.createScorecard();
+        my.readScorecard();
+        my.displayFullCard();
     }
 
     public int getBonusYahtzees(){ return bonusYahtzees; }
@@ -70,22 +72,45 @@ public class ScoreCard {
             fullHouse = new ScoreLine("Full House", 0);
     }
 
+    /**
+     * for each line
+     */
     private void readScorecard(){
         //load data from "scorecard.txt" into a Scorecard
         Scanner inFile;
 
         try {
-            inFile = new Scanner(new File("yahtzeeConfig.txt"));
-            while (inFile.hasNextLine()) {
-                String line = inFile.nextLine();
-                String ln[] = line.split(delim);
-                scoreCard.add(Arrays.asList(ln));
+            inFile = new Scanner(new File("scorecard.txt")).useDelimiter("\\r\\n");
+            Pattern p = Pattern.compile("[\\w\\s]*,[a-zA-Z_0-9]*,[0-9]*");
+            for(ScoreLine scoreLine : upperSection) {
+                String[] my = inFile.next(p).split(delim);
+                upperSection.set(upperSection.indexOf(scoreLine), new ScoreLine(my[0],
+                        Boolean.parseBoolean(my[1]), Integer.parseInt(my[2])));
             }
+            //System.out.println(inFile.next(p).split(delim));
+            for(ScoreLine scoreLine : ofAKinds) {
+                String[] lns = inFile.next(p).split(delim);
+                ofAKinds.set(ofAKinds.indexOf(scoreLine), new ScoreLine(lns[0],
+                        Boolean.parseBoolean(lns[1]), Integer.parseInt(lns[2])));
+            }
+            String[] fH = inFile.next(p).split(delim);
+            fullHouse = new ScoreLine(fH[0], Boolean.parseBoolean(fH[1]), Integer.parseInt(fH[2]));
+            for(ScoreLine scoreLine : straights) {
+                String[] strght = inFile.next(p).split(delim);
+                straights.set(straights.indexOf(scoreLine), new ScoreLine(strght[0],
+                        Boolean.parseBoolean(strght[1]), Integer.parseInt(strght[2])));
+            }
+            String[] yaht = inFile.next(p).split(delim);
+            yahtzee = new ScoreLine(yaht[0], Boolean.parseBoolean(yaht[1]), Integer.parseInt(yaht[2]));
+            String[] chnc = inFile.next(p).split(delim);
+            chance = new ScoreLine(chnc[0], Boolean.parseBoolean(chnc[1]), Integer.parseInt(chnc[2]));
+
         }   catch (FileNotFoundException e) {
             e.printStackTrace();
             System.out.println("File not found");
         }
     }
+
     private void createScorecard(){
         //load data from scores into "scorecard.txt"
         PrintStream outFile = null;
@@ -109,7 +134,8 @@ public class ScoreCard {
 
         Objects.requireNonNull(outFile).println(getYahtzee().getTitle() + delim + getYahtzee().isUsed()
                 + delim + getYahtzee().getScoreValue());
-
+        Objects.requireNonNull(outFile).println(getChance().getTitle() + delim + getChance().isUsed()
+                + delim + getChance().getScoreValue());
         Objects.requireNonNull(outFile).close();
     }
     public boolean isFull(){

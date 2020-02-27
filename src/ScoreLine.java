@@ -41,6 +41,12 @@ public class ScoreLine {
         isUsed = false;
     }
 
+    public ScoreLine (String aTitle,  boolean used, int aScore){
+        title = aTitle;
+        scoreValue = aScore;
+        isUsed = used;
+    }
+
     /**
      * Setter for the <code>int</code> scoreValue.
      *
