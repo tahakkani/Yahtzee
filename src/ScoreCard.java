@@ -1,9 +1,7 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Objects;
 import java.util.Scanner;
 import java.util.regex.Pattern;
@@ -43,12 +41,6 @@ public class ScoreCard {
 
     //used to delimit parts of ScoreCard text file
     private String delim = ",";
-    public static void main(String[] args) {
-        ScoreCard my = new ScoreCard(5, 6);
-        my.displayFullCard();
-        my.readScorecard();
-        my.displayFullCard();
-    }
 
     public int getBonusYahtzees(){ return bonusYahtzees; }
 
@@ -75,7 +67,7 @@ public class ScoreCard {
     /**
      * for each line
      */
-    private void readScorecard(){
+    public void readScorecardTxt (){
         //load data from "scorecard.txt" into a Scorecard
         Scanner inFile;
 
@@ -111,7 +103,7 @@ public class ScoreCard {
         }
     }
 
-    private void createScorecard(){
+    public void updateScorecardTxt(){
         //load data from scores into "scorecard.txt"
         PrintStream outFile = null;
 
@@ -213,6 +205,7 @@ public class ScoreCard {
         System.out.println(divider);
         for (ScoreLine sL : getUpperSection())
             sL.displayLineForFullCard();
+        upperBonus.displayLineForFullCard();
         calcTotalUpper();
         System.out.printf(ScoreLine.displayFormat, "UPPER TOTAL:", totalUpper);
         System.out.println(divider);
@@ -291,34 +284,23 @@ public class ScoreCard {
     }
 
     /**
-     * This resets the values of the whole scorecard to 0
+     * This resets the values of the whole scorecard to 0 AND resets
      */
-    public void resetValues(){
+    public void reset(boolean resetUsed){
         for (ScoreLine sL : getUpperSection())
-            sL.setScoreValue(0);
+            sL.reset(resetUsed);
         for (ScoreLine sL : getOfAKinds())
-            sL.setScoreValue(0);
+            sL.reset(resetUsed);
         if(getFullHouse() != null)
-            getFullHouse().setScoreValue(0);
-        for (ScoreLine sL : getStraights())
-            sL.setScoreValue(0);
-        getYahtzee().setScoreValue(0);
-        getChance().setScoreValue(0);
+            getFullHouse().reset(resetUsed);
+        for (ScoreLine sL : getStraights()){
+            sL.reset(resetUsed);
+        }
+        getYahtzee().reset(resetUsed);
+        getChance().reset(resetUsed);
     }
 
     public ScoreLine getYahtzeeBonus() {
         return yahtzeeBonus;
-    }
-
-    public void setYahtzeeBonus(ScoreLine yahtzeeBonus) {
-        this.yahtzeeBonus = yahtzeeBonus;
-    }
-
-    public ScoreLine getUpperBonus() {
-        return upperBonus;
-    }
-
-    public void setUpperBonus(ScoreLine upperBonus) {
-        this.upperBonus = upperBonus;
     }
 }

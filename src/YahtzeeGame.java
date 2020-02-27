@@ -30,14 +30,13 @@ public class YahtzeeGame {
     public void playGame(){
         boolean gameOver = false;
         //do this while players still have stuff in their scorecards
-        while (!gameOver) {
-            for (YahtzeePlayer player : players){
-                if (!player.getScores().isFull()){
-                    player.takeTurn(DICE_IN_PLAY, ROLLS_PER_TURN);
-                }
-                else gameOver = true;
-            }
+        while (!gameOver) for (YahtzeePlayer player : players) {
+            if (!player.getScores().isFull())
+                player.takeTurn(DICE_IN_PLAY, ROLLS_PER_TURN);
+            else gameOver = true;
         }
+        for (YahtzeePlayer plyr: players)
+            plyr.getScores().reset(true);
     }
 
     /**

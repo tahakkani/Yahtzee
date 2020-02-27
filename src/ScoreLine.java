@@ -75,7 +75,13 @@ public class ScoreLine {
         return title;
     }
 
+    public void reset(boolean resetUsed){
+        scoreValue = 0;
+        if (resetUsed)
+            isUsed = false;
+    }
     public void setUsed(boolean used){ isUsed = used;}
+
     public boolean isUsed() { return isUsed; }
     /**
      * Displays the possible score on a single line in a readable and interpretable manner.

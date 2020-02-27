@@ -36,22 +36,6 @@ public class YahtzeePlayer {
         return scores;
     }
 
-    public static void main(String[] args) {
-        int numSides = 6;
-        int diceInPlay = 5;
-        int rollsPerTurn = 3;
-        YahtzeePlayer player1 = new YahtzeePlayer(numSides, diceInPlay);
-        Scanner kb = new Scanner(System.in);
-        String playAgain = "y";
-
-        while (Objects.equals(playAgain, "y")) {
-            player1.takeTurn(diceInPlay, rollsPerTurn);
-            System.out.println("\nEnter 'y' to play again ");
-            playAgain = kb.next();
-        }
-    }
-
-
     public void askToDisplayScorecard() {
         System.out.println("Would you like to see your scorecard?");
         Scanner kb = new Scanner(System.in);
@@ -90,5 +74,6 @@ public class YahtzeePlayer {
         //possibleScores.displayCard();
         scoreOnLine();
         hand.clearHand();
+        scores.updateScorecardTxt();
     }
 }
