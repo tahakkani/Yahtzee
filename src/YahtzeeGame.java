@@ -1,3 +1,4 @@
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
@@ -5,6 +6,21 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Scanner;
 
+/**
+ * This class is a Yahtzee game, whose member fields are the number of dice in play, rolls per turn, and
+ * YahtzeePlayers (an ArrayList of YahtzeeDie). This class is responsible for initializing the game using outside
+ * text files.
+ *
+ * CPSC 224
+ * Assignment #3
+ * No sources to cite, other than the starter files provided by Dr. Worobec,
+ * specifically for this assignment.
+ *
+ * @author Taha Hakkani
+ * @version 1.0 2/28/2020
+ * @see YahtzeeDie
+ * @see ScoreCard
+ */
 public class YahtzeeGame {
 
     private static int DICE_IN_PLAY;
@@ -16,6 +32,9 @@ public class YahtzeeGame {
         newGame.playGame();
     }
 
+    /**
+     * Constructor for a Yahtzee Game. Initializes the game by setting and creates new YahtzeePlayers.
+     */
     public YahtzeeGame(){
         ArrayList<Integer> config = gameInit();
         //set values that user chose/left as is
@@ -27,6 +46,9 @@ public class YahtzeeGame {
             players.add(new YahtzeePlayer(YahtzeeDie.NUM_SIDES, DICE_IN_PLAY));
     }
 
+    /**
+     * Has each player take a turn in order until each scorecard is full.
+     */
     public void playGame(){
         boolean gameOver = false;
         //do this while players still have stuff in their scorecards
@@ -40,7 +62,9 @@ public class YahtzeeGame {
     }
 
     /**
-     * Finds the file, opens it, reads the values and
+     * Finds the file, opens it, reads the config values and asks user of they would like to change them. If so
+     *
+     * @return the config values to be passed, as an ArrayList
      */
     private ArrayList<Integer> gameInit() {
         //load data from "yahtzeeConfig.txt" into an ArrayList
@@ -53,10 +77,10 @@ public class YahtzeeGame {
             while (inFile.hasNextLine()) {
                 configValues.add(Integer.parseInt(inFile.nextLine()));
             }
-        }   catch (FileNotFoundException e) {
+        } catch (FileNotFoundException e) {
             e.printStackTrace();
             System.out.println("File not found");
-            }
+        }
 
         //display data from "yahtzeeConfig.txt" in an easy-to-read manner
         System.out.println(configValues);
@@ -94,7 +118,6 @@ public class YahtzeeGame {
                 Objects.requireNonNull(outFile).println(config);
             Objects.requireNonNull(outFile).close();
         }
-
         return configValues;
     }
 }

@@ -4,10 +4,8 @@ import java.util.Optional;
 import java.util.Scanner;
 
 /**
- * This class is a Yahtzee player, whose member fields are the player's hand (an ArrayList of YahtzeeDie),
- * the player's scorecard (a series of ScoreLines as well as tallying fields), and a temporary scorecard the displays
- * possible scoring to the user at the end of each turn. This class also has the DICE_IN_PLAY field for the time being,
- * which will probably be passed up to a higher class down the road.
+ * This class is a Yahtzee hand, whose member fields are the player's roll (an ArrayList of YahtzeeDie),
+ * and a temporary scorecard the displays possible scoring to the user at the end of each turn.
  *
  * CPSC 224
  * Assignment #1
@@ -15,7 +13,7 @@ import java.util.Scanner;
  * specifically for this assignment.
  *
  * @author Taha Hakkani
- * @version 1.0 2/5/2020
+ * @version 1.0 2/28/2020
  * @see YahtzeeDie
  * @see ScoreCard
  */
@@ -25,21 +23,42 @@ public class YahtzeeHand {
     //This ScoreCard is the hand's card used to display potential moves based on the current hand
     private ScoreCard possibleScores;
 
+    /**
+     * @param numSides is the number of sides on the die
+     * @param diceInPlay is the number of dice in play
+     */
     public YahtzeeHand(int numSides, int diceInPlay) {
         possibleScores = new ScoreCard(diceInPlay, numSides);
     }
 
+    /**
+     * Uses the clear() method of ArrayLists to remove all YahtzeeDie from the roll. possibleScores are reset to 0
+     */
     public void clearHand(){
         roll.clear();
         possibleScores.reset(false);
     }
 
+    /**
+     * Getter for possibleScores field
+     *
+     * @return possibleScores field
+     */
     public ScoreCard getPossibleScores(){ return possibleScores; }
 
+    /**
+     * @param dieIndex is the position of the die in the hand
+     * @return the YahtzeeDie at position dieIndex
+     */
     public YahtzeeDie getFromHand(int dieIndex){
         return roll.get(dieIndex);
     }
 
+    /**
+     * Adds yahtzeeDie to roll.
+     *
+     * @param yahtzeeDie the die to be added to the hand
+     */
     public void addToHand(YahtzeeDie yahtzeeDie){
         roll.add(yahtzeeDie);
     }
@@ -102,7 +121,6 @@ public class YahtzeeHand {
         return total;
     }
 
-
     /**
      * This function basically implements the rolling part of the players turn. It allows player to keep dice
      * by typing in a string of 'y' and 'n's. Displays the hand after each roll.
@@ -121,7 +139,7 @@ public class YahtzeeHand {
 
         //while there are still rolls left in the turn, re-roll all YahtzeeDie that were not kept
         int rollNum = 1;
-        while (rollNum < rollsPerTurn && Objects.requireNonNull(keep).toString().contains("n")) {
+        while (rollNum <= rollsPerTurn && Objects.requireNonNull(keep).toString().contains("n")) {
             //roll dice not kept
             for (int dieNumber = 0; dieNumber < diceInPlay; dieNumber++)
                 if (keep.charAt(dieNumber) != 'y')
@@ -139,7 +157,7 @@ public class YahtzeeHand {
 
     /**
      * Takes the hand and orders the YahtzeeDie's based on their sideUp values. Is needed to determine if a straight
-     * is acheived.
+     * is achieved.
      */
     public void sortAndDisplayRoll() {
         boolean swap;
@@ -175,7 +193,6 @@ public class YahtzeeHand {
      *
      * @return the highest number of a single YahtzeeDie value in the hand
      */
-
     public int maxOfAKindFound() {
         int maxCount = 0;
         int currentCount;
@@ -218,7 +235,6 @@ public class YahtzeeHand {
      *
      * @return whether a full house was found or not
      */
-
     public boolean fullHouseFound() {
         boolean foundFH = false;
         boolean found3K = false;

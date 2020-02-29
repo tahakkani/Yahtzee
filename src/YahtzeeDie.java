@@ -9,7 +9,7 @@
  * specifically for this assignment.
  *
  * @author Taha Hakkani
- * @version 1.0 2/5/2020
+ * @version 1.0 2/28/2020
  * @see ObjectOfChance
  */
 public class YahtzeeDie extends ObjectOfChance{

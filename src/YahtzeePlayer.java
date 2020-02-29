@@ -1,8 +1,3 @@
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.Objects;
 import java.util.Scanner;
 
 /**
@@ -17,7 +12,7 @@ import java.util.Scanner;
  * specifically for this assignment.
  *
  * @author Taha Hakkani
- * @version 1.0 2/5/2020
+ * @version 1.0 2/28/2020
  * @see YahtzeeDie
  * @see ScoreCard
  */
@@ -36,6 +31,9 @@ public class YahtzeePlayer {
         return scores;
     }
 
+    /**
+     * Asks user if they would like to display their scorecard. If so, displayFullCard() is called
+     */
     public void askToDisplayScorecard() {
         System.out.println("Would you like to see your scorecard?");
         Scanner kb = new Scanner(System.in);
@@ -43,6 +41,11 @@ public class YahtzeePlayer {
             scores.displayFullCard();
     }
 
+    /**
+     * Gets input from user (the name of the line they would like to score on). Searches scorecard for that line
+     * and if it finds it, updates the score on that line from possible scores scorecard and marks that line
+     * as "used". Else, it displays to the user an error message.
+     */
     public void scoreOnLine() {
         Scanner kb = new Scanner(System.in);
         boolean lineFound = false;
@@ -63,6 +66,12 @@ public class YahtzeePlayer {
         }
     }
 
+    /**
+     * Calls a series of other functions from hand and scores that execute a player's full turn
+     *
+     * @param diceInPlay number of dice in play
+     * @param rollsPerTurn number of rolls per turn
+     */
     public void takeTurn(int diceInPlay, int rollsPerTurn) {
         askToDisplayScorecard();
         hand.rollingPhase(diceInPlay, rollsPerTurn);

@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
  * No sources to cite.
  *
  * @author Taha Hakkani
- * @version 1.0 2/5/2020
+ * @version 1.0 2/28/2020
  * @see ScoreLine
  */
 
@@ -44,6 +44,8 @@ public class ScoreCard {
 
     public int getBonusYahtzees(){ return bonusYahtzees; }
 
+    public ScoreLine getYahtzeeBonus() { return yahtzeeBonus; }
+
     public void addBonusYahtzee(){ bonusYahtzees += 1; }
 
     /**
@@ -65,7 +67,9 @@ public class ScoreCard {
     }
 
     /**
-     * for each line
+     * Reads scorecard data from a text file with each ScoreLine on a separate line with
+     * "[\\w\\s]*,[a-zA-Z_0-9]*,[0-9]*" format. Takes that data and sets the fields of the scorecard
+     * accordingly. Catches exception if file not found and displays that.
      */
     public void readScorecardTxt (){
         //load data from "scorecard.txt" into a Scorecard
@@ -103,6 +107,9 @@ public class ScoreCard {
         }
     }
 
+    /**
+     * Takes instance fields from this ScoreCard and saves them to a text file.
+     */
     public void updateScorecardTxt(){
         //load data from scores into "scorecard.txt"
         PrintStream outFile = null;
@@ -130,6 +137,10 @@ public class ScoreCard {
                 + delim + getChance().getScoreValue());
         Objects.requireNonNull(outFile).close();
     }
+
+    /**
+     * @return true if this ScoreCard is full, else false
+     */
     public boolean isFull(){
         for (ScoreLine sL : getUpperSection())
             if (!sL.isUsed()) return false;
@@ -142,6 +153,7 @@ public class ScoreCard {
         if (!getYahtzee().isUsed()) return false;
         return getChance().isUsed();
     }
+
     /**
      * @return the lines on the upper section of the Yahtzee scorecard (as an ArrayList of ScoreLines)
      */
@@ -173,9 +185,9 @@ public class ScoreCard {
     public ScoreLine getChance(){return chance;}
 
    /**
-     * Displays the entire card in an easily comprehensible format for the user.
-     *
-     */
+    * Displays possible lines to score on in an easily comprehensible format for the user. Checks if the line is used
+    * and if not, it displays it.
+    */
     public void displayPossibilities() {
         //upper scorecard
         for (ScoreLine sL : getUpperSection())
@@ -191,12 +203,15 @@ public class ScoreCard {
                 sL.displayLineOffer();
         if (!getYahtzee().isUsed())
             getYahtzee().displayLineOffer();
-        else
+        else if (getYahtzee().getScoreValue() != 0)
             getYahtzeeBonus().displayLineOffer();
         if (!getChance().isUsed())
             getChance().displayLineOffer();
     }
 
+    /**
+     * Displays the fields of this scorecard in an easily readable, formatted manner.
+     */
     public void displayFullCard(){
         String divider = "------------------------";
         String longDivider = "---------------------------------";
@@ -229,9 +244,13 @@ public class ScoreCard {
         System.out.println(longDivider + "\n");
     }
 
+    /**
+     * Calculates the total of the bonus yahtzees scored
+     */
     public void calcYahtzeeBonus(){
         yahtzeeBonus.setScoreValue(bonusYahtzees * 100);
     }
+
     /**
      * Calculates the total of the entire upper section of the scorecard, used for determining if a bonus is earned
      */
@@ -268,6 +287,11 @@ public class ScoreCard {
         grandTotal = totalLower + totalUpper;
     }
 
+    /**
+     * Finds the score line with the corresponding title, returns
+     * @param title is the search criteria for the line
+     * @return the score line with the corresponding title, returns null if not found
+     */
     public ScoreLine findLine(String title){
         for (ScoreLine sL : getUpperSection())
             if (title.equals(sL.getTitle()) && !sL.isUsed()) return sL;
@@ -284,7 +308,9 @@ public class ScoreCard {
     }
 
     /**
-     * This resets the values of the whole scorecard to 0 AND resets
+     * This resets the values of the whole scorecard to 0 AND resets isUsed, if you want
+     *
+     * @param resetUsed true if you want to reset isUsed field, false otherwise
      */
     public void reset(boolean resetUsed){
         for (ScoreLine sL : getUpperSection())
@@ -298,9 +324,5 @@ public class ScoreCard {
         }
         getYahtzee().reset(resetUsed);
         getChance().reset(resetUsed);
-    }
-
-    public ScoreLine getYahtzeeBonus() {
-        return yahtzeeBonus;
     }
 }
