@@ -149,8 +149,10 @@ public class YahtzeeHand {
             displayRoll();
 
             //if not the last roll of the hand prompt the user for dice to keep
-            System.out.println("enter dice to keep (y or n) ");
-            keep = Optional.ofNullable(kb.nextLine()).map(StringBuilder::new).orElse(null);
+            if (rollNum < rollsPerTurn){
+                System.out.println("enter dice to keep (y or n) ");
+                keep = Optional.ofNullable(kb.nextLine()).map(StringBuilder::new).orElse(null);
+            }
             rollNum++;
         }
     }
