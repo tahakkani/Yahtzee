@@ -1,3 +1,7 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Optional;
@@ -29,6 +33,10 @@ public class YahtzeeHand {
      */
     public YahtzeeHand(int numSides, int diceInPlay) {
         possibleScores = new ScoreCard(diceInPlay, numSides);
+    }
+
+    public ArrayList<YahtzeeDie> getRoll() {
+        return roll;
     }
 
     /**
@@ -256,6 +264,42 @@ public class YahtzeeHand {
         if (found2K && found3K)
             foundFH = true;
         return foundFH;
+    }
+
+    private void rollDiceGUI(){
+        for (YahtzeeDie yD : getRoll()) {
+            yD.setKept(false);
+            if (!yD.isKept())
+                yD.setSideUp();
+        }
+    }
+
+    class HandPanel extends JPanel {
+
+        public HandPanel(){
+            for (YahtzeeDie yD : getRoll()) {
+                add(yD.new ImageComponent());
+            }
+            makeButton("Roll");
+        }
+
+        public void makeButton(String name) {
+            JButton button = new JButton(name);
+            add(button);
+            button.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent event) {
+                    rollDiceGUI();
+                    repaint();
+                }
+            });
+        }
+        public void loadDice(YahtzeeDie yD){
+            for (Component component : this.getComponents()){
+                if (component.getClass().getName() == "class YahtzeeDie$ImageComponent") {
+                    component = yD.new ImageComponent();
+                }
+            }
+        }
     }
 }
 
