@@ -1,3 +1,7 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Scanner;
 
 /**
@@ -73,16 +77,52 @@ public class YahtzeePlayer {
      * @param rollsPerTurn number of rolls per turn
      */
     public void takeTurn(int diceInPlay, int rollsPerTurn) {
-        askToDisplayScorecard();
-        hand.rollingPhase(diceInPlay, rollsPerTurn);
+        EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                JFrame playerFrame = new PlayerFrame();
+                playerFrame.setTitle("Player");
+                playerFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                playerFrame.setVisible(true);
+            }
+        });
+        hand.rollingPhaseGUI(diceInPlay, rollsPerTurn);
         //start scoring
         //hand needs to be sorted to check for straights
-        hand.sortAndDisplayRoll();
+/*        hand.sortAndDisplayRoll();
         hand.determine_possibleScores(diceInPlay);
         hand.getPossibleScores().displayPossibilities();
         //possibleScores.displayCard();
         scoreOnLine();
         hand.clearHand();
-        scores.updateScorecardTxt();
+        scores.updateScorecardTxt();*/
+    }
+
+    /**
+     * A frame with a hand panel image component
+     */
+    class PlayerFrame extends JFrame {
+        JPanel buttonPanel = new JPanel();
+        JButton scorecard = new JButton("View scorecard");
+
+        public PlayerFrame() {
+            scorecard.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    //pull up scorecard frame
+                    YahtzeePlayer.this.getScores().displayScoreCardGUI();
+                }
+            });
+
+            Toolkit kit =Toolkit.getDefaultToolkit();
+            Dimension screenSize = kit.getScreenSize();
+            setSize(screenSize.width/2, screenSize.height/2);
+            setLocationByPlatform(true);
+            add(buttonPanel);
+            buttonPanel.add(scorecard);
+            add(buttonPanel, BorderLayout.SOUTH);
+            pack();
+        }
     }
 }
+

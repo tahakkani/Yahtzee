@@ -18,7 +18,7 @@ import java.util.Random;
 
 public class ObjectOfChance {
 
-    public static int NUM_SIDES = 6;
+    public static int NUM_SIDES;
 
     protected int sideUp;
     private Random randObj = new Random();

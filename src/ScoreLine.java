@@ -1,3 +1,6 @@
+import javax.swing.*;
+import java.awt.*;
+
 /**
  * This class is the backbone of the ScoreCard class. Having a separate ScoreLine class allows for a dynamic
  * construction of score cards based on a number of factors (number of sides on the YahtzeeDie, how many dice are
@@ -124,6 +127,5 @@ public class ScoreLine {
     public void displayLineForFullCard(){
         System.out.printf(displayFormat,title, scoreValue);
     }
-
-
+    public String lineForFullCard(){ return String.format(displayFormat,title, scoreValue);}
 }

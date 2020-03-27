@@ -2,6 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Optional;
@@ -268,37 +269,64 @@ public class YahtzeeHand {
 
     private void rollDiceGUI(){
         for (YahtzeeDie yD : getRoll()) {
-            yD.setKept(false);
             if (!yD.isKept())
                 yD.setSideUp();
+            yD.setKept(false);
+        }
+    }
+
+    public void rollingPhaseGUI(int diceInPlay, int rollsPerTurn){
+        for(int i = 0; i < diceInPlay; i++)
+            addToHand(new YahtzeeDie());
+            EventQueue.invokeLater(new Runnable()
+            {
+                public void run()
+                {
+                    JFrame handFrame = new HandFrame();
+                    handFrame.setTitle("Click on die to keep it");
+                    handFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                    handFrame.setVisible(true);
+                }
+            });
+
+    }
+
+    /**
+     * A frame with a hand panel image component
+     */
+    class HandFrame extends JFrame {
+        JPanel buttonPanel = new JPanel();
+        JButton roll = new JButton("Roll");
+        HandPanel handPanel = new HandPanel();
+
+        public HandFrame() {
+            roll.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    rollDiceGUI();
+                    remove(handPanel);
+                    handPanel = new HandPanel();
+                    add(handPanel);
+                    pack();
+                }
+            });
+
+            Toolkit kit =Toolkit.getDefaultToolkit();
+            Dimension screenSize = kit.getScreenSize();
+            setSize(screenSize.width/2, screenSize.height/2);
+            setLocationByPlatform(true);
+            add(handPanel);
+            buttonPanel.add(roll);
+            add(buttonPanel, BorderLayout.SOUTH);
+            pack();
         }
     }
 
     class HandPanel extends JPanel {
 
         public HandPanel(){
-            for (YahtzeeDie yD : getRoll()) {
+            for (YahtzeeDie yD : getRoll())
                 add(yD.new ImageComponent());
-            }
-            makeButton("Roll");
-        }
-
-        public void makeButton(String name) {
-            JButton button = new JButton(name);
-            add(button);
-            button.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent event) {
-                    rollDiceGUI();
-                    repaint();
-                }
-            });
-        }
-        public void loadDice(YahtzeeDie yD){
-            for (Component component : this.getComponents()){
-                if (component.getClass().getName() == "class YahtzeeDie$ImageComponent") {
-                    component = yD.new ImageComponent();
-                }
-            }
         }
     }
 }

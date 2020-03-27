@@ -1,3 +1,5 @@
+import javax.swing.*;
+import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
@@ -325,4 +327,149 @@ public class ScoreCard {
         getYahtzee().reset(resetUsed);
         getChance().reset(resetUsed);
     }
+
+    /**
+     * @version 1.32 2007-06-12
+     * @author Cay Horstmann
+     */
+
+    public void displayScoreCardGUI(){
+        EventQueue.invokeLater(new Runnable()
+        {
+            public void run()
+            {
+                JFrame frame = new ScoreCardFrame();
+                frame.setTitle("Scorecard");
+                frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                frame.setVisible(true);
+            }
+        });
+    }
+
+    class ScoreCardPossFrame extends JFrame
+    {
+        public ScoreCardPossFrame()
+        {
+            add(new ScoreCardComponent());
+            pack();
+        }
+    }
+
+    /**
+     * A component that displays a message.
+     */
+    class ScoreCardPossComponent extends JComponent
+    {
+        public static final int MESSAGE_X = 25;
+        public static final int MESSAGE_Y = 25;
+        public static final int LINE_OFFSET = 25;
+        private int line = 0;
+
+        private static final int DEFAULT_WIDTH = 300;
+        private static final int DEFAULT_HEIGHT = 700;
+
+        public void paintComponent(Graphics g) {
+            String divider = "------------------------";
+            String longDivider = "---------------------------------";
+            printLine(g, longDivider);
+            printLine(g, "UPPER SECTION");
+            printLine(g, divider);
+            for (ScoreLine sL : getUpperSection())
+                printLine(g, sL.lineForFullCard());
+            printLine(g, upperBonus.lineForFullCard());
+            calcTotalUpper();
+            printLine(g, String.format(ScoreLine.displayFormat, "UPPER TOTAL:", totalUpper));
+            printLine(g, divider);
+            printLine(g, "LOWER SECTION");
+            printLine(g, divider);
+            for (ScoreLine sL : getOfAKinds())
+                printLine(g, sL.lineForFullCard());
+            if (getFullHouse() != null) //if full house is possible
+                printLine(g, getFullHouse().lineForFullCard());
+            for (ScoreLine sL : getStraights())
+                printLine(g, sL.lineForFullCard());
+            printLine(g, getYahtzee().lineForFullCard());
+            printLine(g, getChance().lineForFullCard());
+            calcYahtzeeBonus();
+            printLine(g, getYahtzeeBonus().lineForFullCard());
+            calcTotalLower();
+            printLine(g, String.format(ScoreLine.displayFormat,"LOWER TOTAL:", totalLower));
+            printLine(g, divider);
+            calcGrandTotal();
+            printLine(g, String.format(ScoreLine.displayFormat,"GRAND TOTAL:", grandTotal));
+            printLine(g, longDivider);
+        }
+
+        public void printLine(Graphics g, String s){
+            g.drawString(s, MESSAGE_X, MESSAGE_Y + (LINE_OFFSET * line));
+            line++;
+        }
+
+        public Dimension getPreferredSize() { return new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT); }
+    }
+    /**
+     * A frame that contains a message panel
+     */
+    class ScoreCardFrame extends JFrame
+    {
+        public ScoreCardFrame()
+        {
+            add(new ScoreCardComponent());
+            pack();
+        }
+    }
+
+    /**
+     * A component that displays a message.
+     */
+    class ScoreCardComponent extends JComponent
+    {
+        public static final int MESSAGE_X = 25;
+        public static final int MESSAGE_Y = 25;
+        public static final int LINE_OFFSET = 25;
+        private int line = 0;
+
+        private static final int DEFAULT_WIDTH = 300;
+        private static final int DEFAULT_HEIGHT = 700;
+
+        public void paintComponent(Graphics g) {
+            String divider = "------------------------";
+            String longDivider = "---------------------------------";
+            printLine(g, longDivider);
+            printLine(g, "UPPER SECTION");
+            printLine(g, divider);
+            for (ScoreLine sL : getUpperSection())
+                printLine(g, sL.lineForFullCard());
+            printLine(g, upperBonus.lineForFullCard());
+            calcTotalUpper();
+            printLine(g, String.format(ScoreLine.displayFormat, "UPPER TOTAL:", totalUpper));
+            printLine(g, divider);
+            printLine(g, "LOWER SECTION");
+            printLine(g, divider);
+            for (ScoreLine sL : getOfAKinds())
+                printLine(g, sL.lineForFullCard());
+            if (getFullHouse() != null) //if full house is possible
+                printLine(g, getFullHouse().lineForFullCard());
+            for (ScoreLine sL : getStraights())
+                printLine(g, sL.lineForFullCard());
+            printLine(g, getYahtzee().lineForFullCard());
+            printLine(g, getChance().lineForFullCard());
+            calcYahtzeeBonus();
+            printLine(g, getYahtzeeBonus().lineForFullCard());
+            calcTotalLower();
+            printLine(g, String.format(ScoreLine.displayFormat,"LOWER TOTAL:", totalLower));
+            printLine(g, divider);
+            calcGrandTotal();
+            printLine(g, String.format(ScoreLine.displayFormat,"GRAND TOTAL:", grandTotal));
+            printLine(g, longDivider);
+        }
+
+        public void printLine(Graphics g, String s){
+            g.drawString(s, MESSAGE_X, MESSAGE_Y + (LINE_OFFSET * line));
+            line++;
+        }
+
+        public Dimension getPreferredSize() { return new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT); }
+    }
 }
+
