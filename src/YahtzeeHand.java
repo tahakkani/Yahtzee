@@ -326,6 +326,7 @@ public class YahtzeeHand {
                         scoreCardPanel.addComponentListener(YahtzeeHand.HandFrame.this);
                         add(scoreCardPanel,  BorderLayout.EAST);
                         pack();
+                        clearHand();
                     }
                 }
             });
