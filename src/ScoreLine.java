@@ -1,5 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
  * This class is the backbone of the ScoreCard class. Having a separate ScoreLine class allows for a dynamic
@@ -20,7 +22,8 @@ public class ScoreLine {
     private final String title;
     private int scoreValue;
     private boolean isUsed;
-    protected static final String displayFormat = "%-20s %d %n";
+    private boolean gone = false;
+    protected static final String displayFormat = "%-30s %20d %n";
 
     /**
      * Explicit value constructor for ScoreLine when no score is provided.
@@ -86,6 +89,14 @@ public class ScoreLine {
         return title;
     }
 
+    public boolean isGone() {
+        return gone;
+    }
+
+    public void setGone(boolean gone) {
+        this.gone = gone;
+    }
+
     /**
      * Resets the scoreValue field to 0, can reset isUsed field to false, if needed
      *
@@ -128,4 +139,36 @@ public class ScoreLine {
         System.out.printf(displayFormat,title, scoreValue);
     }
     public String lineForFullCard(){ return String.format(displayFormat,title, scoreValue);}
+
+    public class Line extends JPanel{
+        private static final int DEFAULT_WIDTH = 200;
+        private static final int DEFAULT_HEIGHT = 40;
+        JComponent title = new JLabel() {
+
+            @Override
+            public void paintComponent(Graphics g) {
+                super.paintComponents(g);
+                g.drawString(getTitle(), 25, 25);
+            }
+            public Dimension getPreferredSize() {
+                return new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+            }
+        };
+
+        JButton scoreButton = new JButton(Integer.toString(scoreValue));
+        Line(boolean possible){
+            scoreButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    //score on that line
+                    ScoreLine.this.setUsed(true);
+                    Line.this.hide();
+                }
+            });
+            scoreButton.setEnabled(possible);
+            add(title, BorderLayout.EAST);
+            add(scoreButton, BorderLayout.WEST);
+
+        }
+    }
 }

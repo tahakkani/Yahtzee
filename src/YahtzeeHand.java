@@ -2,6 +2,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Objects;
@@ -27,13 +29,14 @@ public class YahtzeeHand {
     private ArrayList<YahtzeeDie> roll = new ArrayList<>();
     //This ScoreCard is the hand's card used to display potential moves based on the current hand
     private ScoreCard possibleScores;
-
+    private static int DICE_IN_PLAY = 5;
     /**
      * @param numSides is the number of sides on the die
      * @param diceInPlay is the number of dice in play
      */
     public YahtzeeHand(int numSides, int diceInPlay) {
         possibleScores = new ScoreCard(diceInPlay, numSides);
+        DICE_IN_PLAY = diceInPlay;
     }
 
     public ArrayList<YahtzeeDie> getRoll() {
@@ -275,16 +278,16 @@ public class YahtzeeHand {
         }
     }
 
-    public void rollingPhaseGUI(int diceInPlay, int rollsPerTurn){
+    public void rollingPhaseGUI(int diceInPlay, int rollsPerTurn, HandFrame handFrame){
+        clearHand();
         for(int i = 0; i < diceInPlay; i++)
             addToHand(new YahtzeeDie());
             EventQueue.invokeLater(new Runnable()
             {
                 public void run()
                 {
-                    JFrame handFrame = new HandFrame();
-                    handFrame.setTitle("Click on die to keep it");
-                    handFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                    handFrame.setTitle("Click on a die to keep it");
+                    handFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
                     handFrame.setVisible(true);
                 }
             });
@@ -294,20 +297,36 @@ public class YahtzeeHand {
     /**
      * A frame with a hand panel image component
      */
-    class HandFrame extends JFrame {
+    class HandFrame extends JFrame implements ComponentListener {
         JPanel buttonPanel = new JPanel();
         JButton roll = new JButton("Roll");
         HandPanel handPanel = new HandPanel();
+        public int ROLLS_PER_TURN;
+        int rolls = 1;
 
-        public HandFrame() {
+        public HandFrame(int rollsPerTurn) {
+            ROLLS_PER_TURN = rollsPerTurn;
+            replace();
             roll.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
-                    rollDiceGUI();
-                    remove(handPanel);
-                    handPanel = new HandPanel();
-                    add(handPanel);
-                    pack();
+                    if (rolls <= rollsPerTurn){
+                        rollDiceGUI();
+                        replace();
+                        rolls++;
+                    }
+                    if (rolls > rollsPerTurn){
+                        sortAndDisplayRoll();
+                        replace();
+                        roll.setEnabled(false);
+                        setTitle("Here is your sorted hand: ");
+                        determine_possibleScores(DICE_IN_PLAY);
+                        //possibleScores.displayScoreCardGUI(true);
+                        ScoreCard.ScoreCardPanel scoreCardPanel = YahtzeeHand.this.getPossibleScores().new ScoreCardPanel(true);
+                        scoreCardPanel.addComponentListener(YahtzeeHand.HandFrame.this);
+                        add(scoreCardPanel,  BorderLayout.EAST);
+                        pack();
+                    }
                 }
             });
 
@@ -315,18 +334,51 @@ public class YahtzeeHand {
             Dimension screenSize = kit.getScreenSize();
             setSize(screenSize.width/2, screenSize.height/2);
             setLocationByPlatform(true);
-            add(handPanel);
+            add(handPanel, BorderLayout.NORTH);
             buttonPanel.add(roll);
             add(buttonPanel, BorderLayout.SOUTH);
             pack();
         }
+
+        public void replace(){
+            remove(handPanel);
+            handPanel = new HandPanel();
+            add(handPanel);
+            pack();
+        }
+
+        @Override
+        public void componentResized(ComponentEvent componentEvent) {
+
+        }
+
+        @Override
+        public void componentMoved(ComponentEvent componentEvent) {
+
+        }
+
+        @Override
+        public void componentShown(ComponentEvent componentEvent) {
+
+        }
+
+        @Override
+        public void componentHidden(ComponentEvent componentEvent) {
+            hide();
+            dispose();
+        }
     }
+
 
     class HandPanel extends JPanel {
 
         public HandPanel(){
+            for (Component c : this.getComponents())
+                this.remove(c);
             for (YahtzeeDie yD : getRoll())
                 add(yD.new ImageComponent());
+            this.revalidate();
+            this.repaint();
         }
     }
 }

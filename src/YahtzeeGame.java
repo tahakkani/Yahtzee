@@ -59,7 +59,7 @@ public class YahtzeeGame {
         //do this while players still have stuff in their scorecards
         for (YahtzeePlayer player : players) {
             if (!player.getScores().isFull())
-                player.takeTurn(DICE_IN_PLAY, ROLLS_PER_TURN);
+                player.takeTurn();
         }
         for (YahtzeePlayer plyr: players)
             plyr.getScores().reset(true);

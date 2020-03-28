@@ -2,6 +2,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.util.Scanner;
 
 /**
@@ -26,10 +28,17 @@ public class YahtzeePlayer {
     //This ScoreCard is the player's official score card for the game
     private ScoreCard scores;
 
+    private static int DICE_IN_PLAY = 5;
+    private static int ROLLS_PER_TURN = 3;
+    private static int NUM_SIDES = 6;
+
     public YahtzeePlayer(int numSides, int diceInPlay) {
         scores = new ScoreCard(diceInPlay, numSides);
         hand = new YahtzeeHand(numSides, diceInPlay);
+        DICE_IN_PLAY = diceInPlay;
+        NUM_SIDES = numSides;
     }
+
 
     public ScoreCard getScores() {
         return scores;
@@ -70,58 +79,106 @@ public class YahtzeePlayer {
         }
     }
 
+    private void setScore(ScoreLine sL){
+        if (sL.isUsed() && !sL.isGone()) {
+            scores.findLine((sL.getTitle())).setScoreValue(sL.getScoreValue());
+            sL.setGone(true);
+        }
+    }
+    public void scoreOnLineGUI() {
+        //upper scorecard
+        for (ScoreLine sL : hand.getPossibleScores().getUpperSection())
+            setScore(sL);
+        //lower scorecard
+        for (ScoreLine sL : hand.getPossibleScores().getOfAKinds())
+            setScore(sL);
+        setScore(hand.getPossibleScores().getFullHouse()); //if full house is possible
+        for (ScoreLine sL : hand.getPossibleScores().getStraights())
+            setScore(sL);
+        if (hand.getPossibleScores().getYahtzee() != null)
+            setScore(hand.getPossibleScores().getYahtzee());
+        else if (hand.getPossibleScores().getYahtzee().getScoreValue() != 0)
+            setScore(hand.getPossibleScores().getYahtzeeBonus());
+        if (hand.getPossibleScores().getChance().isUsed())
+            setScore(hand.getPossibleScores().getChance());
+    }
+
     /**
      * Calls a series of other functions from hand and scores that execute a player's full turn
      *
-     * @param diceInPlay number of dice in play
-     * @param rollsPerTurn number of rolls per turn
      */
-    public void takeTurn(int diceInPlay, int rollsPerTurn) {
+    public void takeTurn() {
+        YahtzeeHand.HandFrame handFrame = hand.new HandFrame(ROLLS_PER_TURN);
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-                JFrame playerFrame = new PlayerFrame();
+                PlayerFrame playerFrame = new PlayerFrame();
                 playerFrame.setTitle("Player");
                 playerFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 playerFrame.setVisible(true);
+                handFrame.addComponentListener(playerFrame);
+
             }
         });
-        hand.rollingPhaseGUI(diceInPlay, rollsPerTurn);
-        //start scoring
-        //hand needs to be sorted to check for straights
-/*        hand.sortAndDisplayRoll();
-        hand.determine_possibleScores(diceInPlay);
-        hand.getPossibleScores().displayPossibilities();
-        //possibleScores.displayCard();
-        scoreOnLine();
-        hand.clearHand();
-        scores.updateScorecardTxt();*/
+        hand.rollingPhaseGUI(DICE_IN_PLAY, ROLLS_PER_TURN, handFrame);
+
     }
 
     /**
      * A frame with a hand panel image component
      */
-    class PlayerFrame extends JFrame {
+    class PlayerFrame extends JFrame implements ComponentListener {
         JPanel buttonPanel = new JPanel();
         JButton scorecard = new JButton("View scorecard");
+        JButton nextRound = new JButton("Next turn");
 
         public PlayerFrame() {
             scorecard.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent actionEvent) {
                     //pull up scorecard frame
-                    YahtzeePlayer.this.getScores().displayScoreCardGUI();
+                    scoreOnLineGUI();
+                    YahtzeePlayer.this.getScores().displayScoreCardGUI(false);
                 }
             });
 
+            nextRound.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    scores.displayFullCard();
+                    hand.getPossibleScores().displayPossibilities();
+                    dispose();
+                    takeTurn();
+                }
+            });
             Toolkit kit =Toolkit.getDefaultToolkit();
             Dimension screenSize = kit.getScreenSize();
             setSize(screenSize.width/2, screenSize.height/2);
             setLocationByPlatform(true);
-            add(buttonPanel);
             buttonPanel.add(scorecard);
+            buttonPanel.add(nextRound);
             add(buttonPanel, BorderLayout.SOUTH);
             pack();
+        }
+
+        @Override
+        public void componentResized(ComponentEvent componentEvent) {
+
+        }
+
+        @Override
+        public void componentMoved(ComponentEvent componentEvent) {
+
+        }
+
+        @Override
+        public void componentShown(ComponentEvent componentEvent) {
+
+        }
+
+        @Override
+        public void componentHidden(ComponentEvent componentEvent) {
+
         }
     }
 }
